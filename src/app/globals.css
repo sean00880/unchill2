@@ -1,0 +1,721 @@
+/* globals.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Imports */
+@font-face {
+  font-family: 'Exo2.0';
+  src: url('/fonts/Exo2.0-Regular.otf') format('opentype');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Exo2.0-Thin';
+  src: url('/fonts/Exo2.0-Thin.otf') format('opentype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Dragen';
+  src: url('/fonts/DragenDemoRegular.ttf');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Genty';
+  src: url('/fonts/Genty.otf') format('opentype');
+  font-weight: 300;
+}
+
+.special{
+  font-family: 'Dragen';
+}
+
+@font-face {
+  font-family: 'Nobody Talks';
+  src: url('/fonts/NobodyTalks.ttf');
+  font-weight: 300;
+}
+
+h1,h2,h3, h4, h5{
+  font-family: 'Exo2.0';
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
+h3 span{
+  font-family:'Dragen';
+  font-size: 1rem;
+}
+
+.button{
+  font-family: 'Exo2.0';
+}
+
+span, button{
+  font-size: .76rem;
+  font-family: 'Exo2.0';
+}
+p{
+  font-size: .8rem;
+  font-family: 'Exo2.0';
+}
+
+table td{
+  font-size: .81rem;
+  font-family: 'Exo2.0';
+
+}
+
+table tr{
+  align-items: center;
+  justify-content: center;
+}
+
+table th{
+  font-family: 'Exo2.0';
+  font-size: .9rem;
+  font-weight: 200!important;
+  font-style:italic;
+}
+
+button{
+  font-size:1em;
+}
+
+table td button{
+  padding:4px;
+}
+
+h1{
+  font-size: 33px;
+}
+
+h1 span{
+  font-size: 33px;
+}
+
+h6{
+  font-family: 'Exo2.0';
+}
+h3{
+  font-size: 1.1rem;
+}
+
+h4 {
+  font-size:15px;
+}
+
+h5{
+  font-size: 19px;
+}
+
+h6{
+  font-size: .6em;
+  font-family: 'Nobody Talks';
+}
+
+/* globals.css */
+
+/* General Styles */
+body {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Geist Sans', sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+  background: url('/images/MLbg1.jpg') no-repeat center center/cover;
+  position: relative;
+  background-attachment: fixed;
+}
+
+nav a{
+  font-family: 'Exo2.0';
+}
+
+.landing-heading {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 3rem;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px rgba(26, 26, 26, 0.845);
+  overflow: hidden;
+  font-family: 'Dragen';
+}
+
+.landing-heading::before,
+.landing-heading::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: black; /* Holographic color */
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch 2s infinite linear alternate-reverse;
+}
+
+.landing-heading::after {
+  color:rgb(255, 187, 0); /* Secondary glitch color */
+  animation: glitch 2s infinite linear alternate-reverse;
+  animation-delay: 0.5s;
+}
+
+@keyframes glitch {
+  0% {
+    clip: rect(20px, 9999px, 85px, 0);
+    transform: translate(-2px, -2px);
+  }
+  25% {
+    clip: rect(15px, 9999px, 70px, 0);
+    transform: translate(2px, 2px);
+  }
+  50% {
+    clip: rect(40px, 9999px, 20px, 0);
+    transform: translate(-2px, 0);
+  }
+  75% {
+    clip: rect(10px, 9999px, 40px, 0);
+    transform: translate(2px, -2px);
+  }
+  100% {
+    clip: rect(30px, 9999px, 60px, 0);
+    transform: translate(0, 2px);
+  }
+}
+
+/* Fade-in animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    
+  }
+  to {
+    opacity: 1;
+
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.hero-section .animate-glitch {
+  position: relative;
+  display: inline-block;
+  color: rgb(234 179 8 / var(--tw-bg-opacity));
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  font-family: 'Genty';
+  font-size: 47px;
+  margin: 0 5px;
+  font-weight: 200;
+  letter-spacing: 4px;
+}
+
+.hero-section .animate-glitch2 {
+  position: relative;
+  display: inline-block;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  font-family: 'Dragen';
+  margin:0 5px;
+}
+
+.hero-section .animate-glitch::after,
+.hero-section .animate-glitch::before {
+  content: 'Meme';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.75;
+  clip: rect(0, 900px, 0, 0);
+}
+
+.hero-section .animate-glitch2::after,
+.hero-section .animate-glitch2::before {
+  content: 'LINKED';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.75;
+  clip: rect(0, 900px, 0, 0);
+}
+
+.hero-section .animate-glitch::after {
+  color: #ffd56a;
+  animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+.hero-section .animate-glitch2::after {
+  color: #bffba8;
+  animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+
+
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(42px, 9999px, 44px, 0);
+    transform: skew(0.3deg);
+  }
+  10% {
+    clip: rect(90px, 9999px, 75px, 0);
+    transform: skew(0.9deg);
+  }
+  20% {
+    clip: rect(19px, 9999px, 62px, 0);
+    transform: skew(0.1deg);
+  }
+  30% {
+    clip: rect(70px, 9999px, 50px, 0);
+    transform: skew(0.2deg);
+  }
+  40% {
+    clip: rect(40px, 9999px, 40px, 0);
+    transform: skew(0.5deg);
+  }
+  50% {
+    clip: rect(50px, 9999px, 20px, 0);
+    transform: skew(0.7deg);
+  }
+  60% {
+    clip: rect(60px, 9999px, 80px, 0);
+    transform: skew(0.3deg);
+  }
+  70% {
+    clip: rect(30px, 9999px, 60px, 0);
+    transform: skew(0.4deg);
+  }
+  80% {
+    clip: rect(20px, 9999px, 50px, 0);
+    transform: skew(0.6deg);
+  }
+  90% {
+    clip: rect(10px, 9999px, 70px, 0);
+    transform: skew(0.2deg);
+  }
+  100% {
+    clip: rect(0, 9999px, 30px, 0);
+    transform: skew(0.5deg);
+  }
+}
+
+/* Tokenomics Chart */
+.holographic-chart {
+  background: radial-gradient(circle, #1a1a1a, #0a0a0a);
+  box-shadow: 0 0 15px 5px #00ffcc;
+ 
+}
+
+.topbar{
+position: fixed;
+top: 0;
+z-index: 100;
+width: 100%;
+}
+
+.feed_sidebar{
+  height: 85vh;
+  position: fixed;
+  margin-top: 5vh;
+  right: 0;
+  margin-right: 2vh;
+}
+
+section{
+  min-height: 100vh;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+
+/* Global Variables */
+:root {
+  --primary-color: #ffd900;
+  --dark-green: #004d40;
+  --matt-black: #333333;
+  /* Accent Colors */
+  --yellow-accent: #ffeb78;
+  --red-accent: #ff5555;
+
+    /* Background Colors */
+    --dark-background: #090909;
+    --darker-background: #141414;
+  
+    /* Light theme colors */
+    --background-light: #ffffff;
+    --foreground-light: #004d40; /* Adjust this if necessary for better visibility */
+    --sidebar-bg-light: #ffffff;
+    --card-bg-light: #f1f1f1;
+    --card-text-light: #1c1c1c;
+    --topbar-bg-light: #ffffff;
+    --topbar-text-light: #004d40;
+  
+    /* Dark theme colors */
+    --background-dark: #090909;
+    --foreground-dark: #ededed; /* Light grey text for good visibility in dark mode */
+    --sidebar-bg-dark: #090909;
+    --card-bg-dark: #272727;
+    --card-text-dark: #ffffff; /* White text for dark cards */
+    --topbar-bg-dark: #090909;
+    --topbar-text-dark: #ededed;
+  
+    /* Specific Text Color Variables */
+    --text-primary-dark: #ffffff; /* White text for most text in dark mode */
+    --text-secondary-dark: #cccccc; /* Slightly dimmer white for less important text */
+    --text-primary-light: #333333; /* Darker text for light mode */
+    --text-secondary-light: #777777; /* Light grey text for less important info in light mode */
+  }
+  
+  /* Applying Text Colors based on Theme */
+  .project-box, .community-box {
+    color: var(--card-text); /* Default text color */
+  }
+  
+  [data-theme="dark"] .project-box, [data-theme="dark"] .community-box {
+    --card-text: var(--text-primary-dark);
+  }
+
+  /* Define the keyframes for the gradient animation */
+@keyframes buttonGradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+.dexTable tr:hover {
+  background-color: var(--darker-background);
+}
+
+
+/* Gradient styles for buttons in dark mode */
+[data-theme="dark"] .gradient-button {
+  background: linear-gradient(270deg, #2c342d, #303030, #55594f, #313230);
+  background-size: 200% 200%;
+  animation: buttonGradientAnimation 5s ease infinite;
+  color: var(--text-primary-dark);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient styles for buttons in light mode */
+[data-theme="light"] .gradient-button {
+  background: linear-gradient(270deg, #2b2e2c, #292a29, #3b423c, #1a1919);
+  background-size: 200% 200%;
+  animation: buttonGradientAnimation 5s ease infinite;
+  color: var(--text-primary-dark);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-box .membersTable tr:hover{
+background-color: none!important;
+}
+
+.gradient-button:hover {
+  box-shadow: 0px 0px 5px rgba(189, 244, 166, 0.771);
+  transform: scale(1.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect */
+[data-theme="light"] .gradient-button:hover {
+  box-shadow: 0px 0px 15px rgba(176, 224, 157, 0.7);
+}
+
+[data-theme="dark"].gradient-button:hover {
+  box-shadow: 0px 0px 5px rgba(232, 48, 48, 0.7)!important;
+  transform: scale(1.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+  [data-theme="dark"] select{
+   
+      appearance: none; /* Removes default styling for a clean slate */
+      background-color: rgb(56, 56, 56); /* Dark background if dark mode */
+      color: var(--text-primary-dark); /* White or light text */
+      padding: 0.75rem; /* Add padding for better spacing */
+      border: 3px solid rgba(225, 239, 224, 0.14); /* Border color */
+      border-radius: 8px; /* Rounded corners */
+      font-family: inherit; /* Matches the font */
+      font-size: 1rem;
+      width: 100%;
+      transition: background-color 0.3s ease, color 0.3s ease;
+   
+  }
+
+  [data-theme="dark"] .project-box .link{
+    filter: invert(100%);
+  }
+  
+  [data-theme="light"] .project-box, [data-theme="light"] .community-box {
+    --card-text: var(--text-primary-light);
+  }
+  
+  /* Additional Styling for Secondary Text */
+  .project-box .secondary-text, .community-box .secondary-text {
+    color: var(--text-secondary-dark);
+  }
+  
+  [data-theme="light"] .project-box .secondary-text, [data-theme="light"] .community-box .secondary-text {
+    color: var(--text-secondary-light);
+  
+
+  /* Shared theme styles */
+  --border-color-light: rgba(0, 0, 0, 0.1);
+  --border-color-dark: rgba(255, 255, 255, 0.2);
+  --shadow-color-light: rgba(0, 0, 0, 0.2);
+  --shadow-color-dark: rgba(255, 255, 255, 0.3);
+}
+
+/* Light Mode */
+[data-theme="light"] {
+  
+  --background: var(--background-light);
+  --foreground: var(--foreground-light);
+  --sidebar-bg: var(--sidebar-bg-light);
+  --card-bg: var(--card-bg-light);
+  --card-text: var(--card-text-light);
+  --topbar-bg: var(--topbar-bg-light);
+  --topbar-text: var(--topbar-text-light);
+  --border-color: var(--border-color-light);
+  --shadow-color: var(--shadow-color-light);
+  .bg-light-background{
+    background: white;
+  }
+  .text{
+    color:black
+  }
+  a{
+    color:rgb(29, 29, 29);
+  }
+  --dashboard-bg-image: url('/images/GROWSZBG.PNG'); 
+  --overlay-gradient: linear-gradient(0deg, rgba(255, 255, 255, 0.89), rgba(255, 255, 255, 0.99));
+  table th {
+    color: #2c2c2c;
+    font-weight: bold;
+  }
+  .dashboard{
+    background:white;
+  }
+}
+
+.project-box .icon-container{
+  padding: 0;
+    height: 50px;
+    width: 75px;
+}
+
+
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
+  --sidebar-bg: var(--sidebar-bg-dark);
+  --card-bg: var(--card-bg-dark);
+  --card-text: var(--card-text-dark);
+  --topbar-bg: var(--topbar-bg-dark);
+  --topbar-text: var(--topbar-text-dark);
+  --border-color: var(--border-color-dark);
+  --shadow-color: var(--shadow-color-dark);
+  table th {
+    color: #f3f3f3;
+    font-weight: bold;
+  }
+  .dashboard{
+    background:#060606;
+  }
+  table td {
+    color: white;
+  }
+}
+
+/* Project and Community Box Styling */
+.project-box, .community-box {
+  background-color: var(--card-bg);
+  color: var(--card-text);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* TopBar Styling */
+.topbar {
+  background-color: var(--topbar-bg);
+  color: var(--topbar-text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.topbar .btn-connect {
+  background: var(--topbar-bg);
+  color: var(--topbar-text);
+  border: 2px solid var(--primary-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.topbar .btn-connect:hover {
+  background: var(--primary-color);
+  color: var(--topbar-bg);
+}
+
+.dashboard {
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-theme="light"] h1, 
+[data-theme="light"] h2, 
+[data-theme="light"] h3, 
+[data-theme="light"] .heading {
+  color: #000000; /* Black color for headings in light theme */
+
+}
+
+text
+
+[data-theme="light"] .pulse {
+  color: white; /* Black color for headings in light theme */
+
+}
+
+/* Glass Effect for Table Container */
+.dex-table-container {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+
+/* Table Styling */
+table th,
+table td {
+  margin: .3rem 0;
+}
+
+
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background: linear-gradient(270deg, #11a82a, #313131, #ff5555, #313131);
+  background-size: 400% 400%;
+  animation: gradient-animation 8s ease infinite;
+  padding: 1.25rem; /* Equivalent to p-5 */
+  border-radius: 8px; /* Adjust if you want rounded corners */
+}
+
+.icon-animation {
+  position: relative;
+  animation: moveIcon 5s infinite;
+  
+}
+
+@keyframes moveIcon {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+
+
+
+/* Flowchart Styling */
+.roadmap-section {
+  position: relative;
+}
+
+.roadmap-timeline {
+  position: relative;
+  padding-left: 2rem;
+  border-left: 4px solid #ffcc00;
+  margin: 2rem 0;
+}
+
+.roadmap-phase {
+  position: relative;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  background: #222;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+  transition: transform 0.3s;
+}
+
+.roadmap-phase:hover {
+  transform: scale(1.02);
+}
+
+.roadmap-phase-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.roadmap-phase-desc {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+.roadmap-timeline:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: #ffcc00;
+}
+
+.phase-icon {
+  position: absolute;
+  left: -1.5rem;
+  top: 1rem;
+  background-color: #ffcc00;
+  border-radius: 50%;
+  padding: 0.5rem;
+  color: #000;
+}
