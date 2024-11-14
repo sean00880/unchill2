@@ -299,7 +299,7 @@ const HomePage: React.FC = () => {
         <div>
           <h3 className="text-2xl font-semibold mb-4">Explore the Latest from MemeLinked</h3>
           <p className="mb-4">
-            Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked. Discover how the community is thriving, find expert tips, and learn more about our ecosystem's innovations.
+            Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked. Discover how the community is thriving, find expert tips, and learn more about our ecosystem&apos;s innovations.
           </p>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-4 bg-gray-100 rounded-lg shadow-md">

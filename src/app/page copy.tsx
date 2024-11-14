@@ -6,19 +6,7 @@ import LandingLayout from '../components/LandingLayout';
 
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('utility');
-  const [selectedImage, setSelectedImage] = useState('/images/default_logo.png');
 
-  const images = [
-    '/images/default_logo.png',
-    '/images/default_logo.png',
-    '/images/default_logo.png',
-    '/images/default_logo.png',
-    '/images/default_logo.png',
-  ];
-
-  const handleImageClick = (image: string) => {
-    setSelectedImage(image);
-  };
 
   return (
     <LandingLayout>
