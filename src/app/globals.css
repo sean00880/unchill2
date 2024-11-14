@@ -116,6 +116,14 @@ h6{
   font-family: 'Nobody Talks';
 }
 
+.phase-marker{
+background: rgba( 255, 180, 0, 0.5 );
+box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+backdrop-filter: blur( 9.5px );
+-webkit-backdrop-filter: blur( 9.5px );
+border-radius: 10px;
+}
+
 /* globals.css */
 
 /* General Styles */

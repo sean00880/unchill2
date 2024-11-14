@@ -144,7 +144,7 @@ const HomePage: React.FC = () => {
         <div className="bg-[#090909] p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
           <h3 className="text-2xl font-semibold mb-2">Total Supply</h3>
           <p className="text-3xl font-bold text-yellow-500">1 Trillion</p>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-gray-200">
             Strategically set to ensure a balanced ecosystem and sustainable growth.
           </p>
         </div>
@@ -158,7 +158,7 @@ const HomePage: React.FC = () => {
             <br />
             <strong className="text-yellow-500">Sell:</strong> 4%
           </p>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-gray-200">
             The 4% sell tax is split evenly for marketing (2%) and development (2%) to support ongoing growth.
           </p>
         </div>
@@ -244,7 +244,7 @@ const HomePage: React.FC = () => {
             onMouseEnter={(e) => e.currentTarget.classList.add('scale-105')}
             onMouseLeave={(e) => e.currentTarget.classList.remove('scale-105')}
           >
-            <div className="phase-marker w-24 h-12 flex items-center justify-center rounded-full shadow-md bg-opacity-60 backdrop-blur-md border border-yellow-500" style={{ background: 'rgba(255, 255, 255, 0.1)', boxShadow: '0 4px 8px rgba(255, 255, 255, 0.2)' }}>
+            <div className="phase-marker w-24 h-12 flex items-center justify-center rounded-full shadow-md border border-yellow-500" style={{ background: 'rgba(255, 255, 255, 0.1)', boxShadow: '0 4px 8px rgba(255, 255, 255, 0.2)' }}>
               <span className="text-white font-bold">{index + 1}</span>
             </div>
             <div className="phase-card ml-6 p-6 bg-[#090909] bg-opacity-80 backdrop-blur-md border border-yellow-500 rounded-xl shadow-lg transform transition-transform duration-300">
@@ -414,8 +414,8 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Copyright Bar */}
-      <div className="mt-8 text-center text-gray-500 border-t border-gray-700 pt-4">
-        &copy; PabloCro | 2024 | Powered by MSI
+      <div className="mt-8 text-center text-gray-300 border-t border-[#ffbf00] pt-4">
+        &copy; PabloCRO | 2024 | Powered by MSI
       </div>
     </footer>
   

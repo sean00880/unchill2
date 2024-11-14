@@ -12,7 +12,7 @@ export default function TopBar() {
   };
 
   return (
-    <div className="topbar flex items-center justify-between px-4 py-4 shadow-lg border-b border-gray-700 relative">
+    <div className="topbar flex items-center justify-between px-4 py-4 shadow-lg border-b border-[#ffbf00] relative">
       {/* Hamburger Menu for Mobile */}
       <div className="flex md:hidden">
         <button
