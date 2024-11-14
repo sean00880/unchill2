@@ -1,7 +1,7 @@
 // src/app/feed/page.tsx
 import SidebarAd from '../../components/SideBarAd';
 import Post from '../../components/Post';
-import TrendingBar from '@components/TrendingBar';
+import TrendingBar from '../../components/TrendingBar';
 import GetLinked from '../../components/GetLinked';
 
 const samplePosts = [
@@ -12,7 +12,7 @@ const samplePosts = [
     content: 'Exploring the latest in DeFi. What are your thoughts?',
     isDarkMode: true,
     verified: true,
-    media: ['/images/default_logo.jpg', '/images/default_logo.jpg','/images/default_logo.jpg', '/images/default_logo.jpg', '/images/default_logo.jpg'] // Example images
+    media: ['/images/default_logo.jpg', '/images/default_logo.jpg', '/images/default_logo.jpg', '/images/default_logo.jpg', '/images/default_logo.jpg'] // Example images
   },
   {
     username: 'JaneCrypto',
@@ -25,10 +25,10 @@ const samplePosts = [
   }
 ];
 
-export default function FeedPage({ isDarkMode }: { isDarkMode: boolean }) {
+export default function FeedPage() {
   return (
-    <div className={`feed-page min-h-screen ${isDarkMode ? 'bg-dark-background text-black' : 'bg-light-background text-white'} font-sans`}>
-      <TrendingBar isDarkMode={isDarkMode} />
+    <div className="feed-page min-h-screen bg-light-background text-white font-sans">
+      <TrendingBar isDarkMode={true} />
       <div className="flex">
         {/* Left Ad Sidebar */}
         <SidebarAd position="left" />
@@ -36,7 +36,7 @@ export default function FeedPage({ isDarkMode }: { isDarkMode: boolean }) {
         {/* Main Content - Posts & Right Sections */}
         <div className="flex-grow mx-2 grid grid-cols-12 gap-4">
           {/* Main Post Feed (8 columns) */}
-          <div className="col-span-8 ">
+          <div className="col-span-8">
             {samplePosts.map((post, index) => (
               <Post key={index} {...post} />
             ))}
@@ -54,9 +54,6 @@ export default function FeedPage({ isDarkMode }: { isDarkMode: boolean }) {
             </ul>
           </div>
         </div>
-
-        {/* Right Ad Sidebar */}
-       
       </div>
     </div>
   );
