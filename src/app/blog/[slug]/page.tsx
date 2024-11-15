@@ -1,10 +1,9 @@
 // src/app/blog/[slug]/page.tsx
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
 interface BlogPostProps {
-  params: {
-    slug: string;
-  };
+  params: { slug: string };
 }
 
 export default function BlogPost({ params }: BlogPostProps) {
@@ -121,7 +120,13 @@ export default function BlogPost({ params }: BlogPostProps) {
     // Add other posts here with similar structure and extended content...
   ];
 
+
   const postContent = posts.find((post) => post.href === slug);
+
+  if (!postContent) {
+    notFound(); // Redirects to the 404 page if the post is not found
+  }
+
 
   return (
     <div className="p-4">
