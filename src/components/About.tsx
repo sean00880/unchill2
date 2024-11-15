@@ -101,6 +101,22 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
             </button>
           </aside>
           <div className="flex-grow bg-[#090909] p-4 md:p-6 rounded-lg text-white">
+          {aboutActiveTab === 'defi' && (
+                <div className="relative bg-[#090909] p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+                <h3 className="text-3xl font-bold text-yellow-500 mb-4">DeFi Social Network</h3>
+                <p className="text-gray-300">
+                  MemeLinked's social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
+                </p>
+                <Image
+                  src="/images/ML1.jpg"
+                  alt="DeFi Social Network"
+                  className="mt-4 rounded-lg shadow-lg glassmorphism-effect animate-fade-in"
+                  width={400}
+                  height={250}
+                />
+              </div>
+            )}
+       
           {aboutActiveTab === 'gamefi' && (
               <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
                 <h3 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4">GameFi</h3>
