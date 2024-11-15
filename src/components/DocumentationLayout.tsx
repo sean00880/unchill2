@@ -20,7 +20,7 @@ const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({ children, pos
     <div className="flex flex-col min-h-screen">
       <TopBar />
       <div className="flex flex-row">
-        {/* Sidebar for navigation */}
+        {/* Pass the posts prop to Sidebar */}
         <Sidebar posts={posts} />
         
         {/* Main content area */}
