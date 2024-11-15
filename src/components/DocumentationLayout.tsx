@@ -20,17 +20,15 @@ const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({ children, pos
     <div className="flex flex-col min-h-screen">
       <TopBar />
       <div className="flex flex-row">
-        {/* Sidebar is only rendered here */}
+        {/* Sidebar for navigation */}
         <Sidebar posts={posts} />
         
-        {/* Main content */}
-        <main className=" bg-background text-foreground">
+        {/* Main content area */}
+        <main className="bg-background text-foreground flex-grow p-4">
           {children}
         </main>
-
-       
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
