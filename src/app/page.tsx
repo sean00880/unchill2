@@ -19,9 +19,7 @@ const HomePage: React.FC = () => {
     '/images/default_logo.png',
   ];
 
-  const handleImageClick = (image: string) => {
-    setSelectedImage(image);
-  };
+
 
   return (
     <LandingLayout>
