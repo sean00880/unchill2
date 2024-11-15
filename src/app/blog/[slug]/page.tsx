@@ -12,7 +12,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   const posts = [
     {
-      title: 'How MemeLinked Integrates DeFi and Social Networking, test',
+      title: 'How MemeLinked Integrates DeFi and Social Networking',
       href: 'defi-social-networking',
       content: (
         <>
