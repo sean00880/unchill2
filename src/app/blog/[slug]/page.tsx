@@ -1,16 +1,13 @@
 // src/app/blog/[slug]/page.tsx
-import { notFound } from 'next/navigation';
+'use client'; // Add this line to indicate that this is a client-side component
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
+import React from 'react';
 
-// Use a type to align with the PageProps expected by Next.js
-type BlogPostPageProps = {
-  params: { slug: string };
-};
-
-// Ensure the function is marked as async if needed
-export default function BlogPost({ params }: BlogPostPageProps) {
-  // Access `slug` directly from `params`
-  const { slug } = params;
+export default function BlogPost() {
+  // Use `useParams` hook to get the slug from the URL
+  const params = useParams();
+  const slug = params?.slug;
 
   const posts = [
     {
