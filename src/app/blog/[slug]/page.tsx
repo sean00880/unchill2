@@ -120,21 +120,15 @@ export default function BlogPost({ params }: BlogPostProps) {
     // Add other posts here with similar structure and extended content...
   ];
 
-
   const postContent = posts.find((post) => post.href === slug);
 
   if (!postContent) {
-    notFound(); // Redirects to the 404 page if the post is not found
+    return notFound(); // Use return here to ensure the function exits properly
   }
-
 
   return (
     <div className="p-4">
-      {postContent ? (
-        postContent.content
-      ) : (
-        <p className="text-center text-red-500">Post not found.</p>
-      )}
+      {postContent.content}
     </div>
   );
 }
