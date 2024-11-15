@@ -1,5 +1,4 @@
 // src/app/blog/[slug]/page.tsx
-import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 
 interface BlogPostProps {
@@ -7,17 +6,6 @@ interface BlogPostProps {
     slug: string;
   };
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { slug } = context.params as { slug: string };
-  return {
-    props: {
-      params: {
-        slug,
-      },
-    },
-  };
-};
 
 export default function BlogPost({ params }: BlogPostProps) {
   const { slug } = params;
