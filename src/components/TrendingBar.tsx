@@ -36,14 +36,12 @@ export default function TrendingBar({ isDarkMode }: { isDarkMode: boolean }) {
     { id: 7, name: 'DACAT', logo: '/logos/dacat.png' },
     { id: 8, name: 'GINU', logo: '/logos/ginu.png' },
     { id: 9, name: 'SATO', logo: '/logos/sato.png' },
-    { id: 9, name: 'SATO', logo: '/logos/sato.png' },
-    // Add more items as needed
   ];
 
   return (
-    <div className="relative overflow-hidden flex items-center w-full">
+    <div className="relative overflow-hidden flex items-center w-full bg-black p-2">
       <div
-        className="trending-title px-4 special text-xl flex-shrink-0 z-10"
+        className="trending-title px-4 text-xl flex-shrink-0 z-10"
         style={{
           width: '15%',
           background: isDarkMode

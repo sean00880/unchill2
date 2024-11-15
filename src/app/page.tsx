@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import LandingLayout from '../components/LandingLayout';
 import Link from 'next/link';
-import { FaTelegramPlane, FaTwitter } from "react-icons/fa";
+import Footer from '../components/Footer';
+import AboutSection from '../components/About';
+
 const HomePage: React.FC = () => {
   
-  const [selectedImage, setSelectedImage] = useState('/images/default_logo.png');
-  const [aboutActiveTab, setAboutActiveTab] = useState('defi');
+
   const [activeTab, setActiveTab] = useState('blog'); // This is for the Blog/Documentation section
   const images = [
     '/images/default_logo.png',
@@ -26,111 +27,37 @@ const HomePage: React.FC = () => {
     <LandingLayout>
       {/* Hero Section */}
       <section className="hero-section flex flex-col items-center justify-center min-h-screen bg-cover bg-center relative">
-        <div className="absolute inset-0 bg-[#090909] bg-opacity-50"></div>
-        <div className="z-10 text-center flex flex-col items-center text-white p-6">
-          <Image src="/images/default_logo.jpg" width={200} height={200} alt="MemeLinked Logo" className="w-32 rounded-full h-32 mb-4" />
-          <h1 className="text-5xl font-extrabold mb-2"><span className="meme animate-glitch">Meme</span><span className="animate-glitch2">LINKED</span></h1>
-          <p className="text-lg mb-6">
-            A DeFi project on Ethereum, part of the Monkey Shit Inu ecosystem, where memes meet decentralized finance.
-          </p>
-          <div className="bg-yellow-500 text-black px-4 py-2 rounded-md mb-2 hover:bg-yellow-600 cursor-pointer">
-            Official Contract Address: <span className="font-mono">0xMemeLinkedContractAddress</span>
-          </div>
-          <button className="px-6 py-3 bg-yellow-500 text-black rounded-lg shadow hover:bg-yellow-600">
-            Connect Wallet
-          </button>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="about-section bg-[#e0e0e0] text-black py-16 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto flex flex-col">
-        <h2 className="text-4xl font-bold mb-6 text-center landing-heading">About</h2>
-        <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4 left-0"></div>
-        <p className="text-lg mb-4 text-center md:text-left">
-          MemeLinked is more than just a token; it&apos;s a unique blend of meme culture and utility within the MSI ecosystem.
-          Founded by the visionary Pablo Cro, MemeLinked offers an engaging social network that fuels organic growth and
-          exposure for real projects. Our platform bridges the gap between fun and functionality, empowering users to
-          connect in a space where communities thrive and opportunities abound.
+      <div className="absolute inset-0 bg-[#090909] bg-opacity-50"></div>
+      <div className="z-10 text-center flex flex-col items-center text-white p-6">
+        <Image src="/images/default_logo.jpg" width={200} height={200} alt="MemeLinked Logo" className="w-32 rounded-full h-32 mb-4" />
+        <h1 className="text-5xl font-extrabold mb-2">
+          <span className="meme animate-glitch">Meme</span>
+          <span className="animate-glitch2">LINKED</span>
+        </h1>
+        <p className="text-lg mb-6">
+          A DeFi project on Ethereum, part of the Monkey Shit Inu ecosystem, where memes meet decentralized finance.
         </p>
-        <div className="flex flex-col md:flex-row mt-8">
-          <aside className="flex-none w-full md:w-48 mb-4 md:mb-0 md:mr-4">
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 rounded-sm text-left ${aboutActiveTab === 'defi' ? 'bg-[#090909] italic text-white' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
-              onClick={() => setAboutActiveTab('defi')}
-            >
-              DeFi Social Network
-            </button>
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${aboutActiveTab === 'gamefi' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
-              onClick={() => setAboutActiveTab('gamefi')}
-            >
-              GameFi
-            </button>
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${aboutActiveTab === 'memes' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
-              onClick={() => setAboutActiveTab('memes')}
-            >
-              Memes
-            </button>
-          </aside>
-          <div className="flex-grow bg-[#090909] p-4 md:p-6 rounded-lg text-white">
-            {aboutActiveTab === 'defi' && (
-              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg items-center flex flex-col">
-                <h3 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4">DeFi Social Network</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  MemeLinked&apos;s social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
-                </p>
-                <Image
-                  src="/images/ML3.png"
-                  alt="DeFi Social Network"
-                  className="mt-4 rounded-lg shadow-lg glassmorphism-effect animate-fade-in w-full max-w-md"
-                  width={400}
-                  height={250}
-                />
-              </div>
-            )}
-            {aboutActiveTab === 'gamefi' && (
-              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
-                <h3 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4">GameFi</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  Our GameFi integration, highlighted by MonkeyKongRacing, delivers engaging and immersive experiences to the MSI ecosystem. This feature allows users to enjoy interactive gameplay while contributing to the community&apos;s overall value and entertainment.
-                </p>
-                <Image
-                  src="/images/gamefi.png"
-                  alt="GameFi"
-                  className="mt-4 rounded-lg shadow-lg glassmorphism-effect animate-fade-in w-full max-w-md"
-                  width={400}
-                  height={250}
-                />
-              </div>
-            )}
-            {aboutActiveTab === 'memes' && (
-              <div>
-                <h3 className="text-2xl md:text-3xl mb-2">Celebrating Meme Culture</h3>
-                <div className="carousel-container">
-                  <Image src={selectedImage} alt="Meme Preview" width={400} height={400} className="w-full rounded-lg border border-yellow-500" />
-                  <div className="gallery mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {images.map((image, index) => (
-                      <div key={index} className="relative">
-                        <Image
-                          src={image}
-                          alt={`Gallery Item ${index + 1}`}
-                          className="w-full h-auto cursor-pointer rounded-lg hover:border-2 hover:border-yellow-500"
-                          width={200}
-                          height={200}
-                          onClick={() => handleImageClick(image)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="bg-yellow-500 text-black px-4 py-2 rounded-md mb-2 hover:bg-yellow-600 cursor-pointer">
+          Official Contract Address: <span className="font-mono">0xMemeLinkedContractAddress</span>
+        </div>
+         {/*
+        <button className="px-6 py-3 bg-yellow-500 text-black rounded-lg shadow hover:bg-yellow-600">
+          Connect Wallet
+        </button>*/}
+
+        {/* Social Icons Section */}
+        <div className="mt-6 bg-black/50 backdrop-blur-lg socials-container p-4 rounded-xl shadow-lg flex justify-center space-x-4">
+         <Link href="https://x.com/MemeLinked"> <Image src="/icons/x.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" /></Link>
+          <Image src="/icons/telegram.png" width={50} height={50} alt="MemeLinked Telegram" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/dextools.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/dexscreener.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/linktree.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white bg-white cover rounded-full" />
         </div>
       </div>
     </section>
+
+      {/* About Section */}
+      <AboutSection images={images} />
 {/* Tokenomics Section */}
 {/* Tokenomics Section */}
 <section className="tokenomics-section py-16 p-4 bg-[#e3af2c] text-white relative flex flex-col">
@@ -344,80 +271,7 @@ const HomePage: React.FC = () => {
         
       </section>
     
-    <footer className="bg-black text-white py-12">
-      <div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between">
-        {/* Left Section - Logo and Subtitle */}
-        <div className="mb-8 md:mb-0">
-          <Image
-            src="/images/LOGODARK.png" // Replace with your logo path
-            alt="Logo"
-            width={200}
-            height={40}
-            className="mb-2"
-          />
-          <p className="text-gray-400">Connecting Communities through Memes and DeFi.</p>
-        </div>
-
-        {/* Center Section - Links */}
-        <div className="flex flex-col md:flex-row justify-between w-full md:w-2/3">
-          {/* Menu Links */}
-          <div className="mb-8 md:mb-0">
-            <h3 className="text-xl font-bold mb-2">Menu</h3>
-            <ul>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#home">Home</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#about">About</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#tokenomics">Tokenomics</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#roadmap">Roadmap</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#whitepaper">Whitepaper</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/#resources">Resources</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div className="mb-8 md:mb-0">
-            <h3 className="text-xl font-bold mb-2">Legal</h3>
-            <ul>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/privacy-policy">Privacy Policy</Link>
-              </li>
-              <li className="mb-1 hover:text-yellow-500">
-                <Link href="/terms-of-use">Terms of Use</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Links */}
-          <div>
-            <h3 className="text-xl font-bold mb-2">Connect with Us</h3>
-            <div className="flex space-x-4">
-              <a href="https://t.me/your-telegram-link" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500">
-                <FaTelegramPlane size={24} />
-              </a>
-              <a href="https://twitter.com/your-twitter-link" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-500">
-                <FaTwitter size={24} />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright Bar */}
-      <div className="mt-8 text-center text-gray-300 border-t border-[#ffbf00] pt-4">
-        &copy; PabloCRO | 2024 | Powered by MSI
-      </div>
-    </footer>
+  <Footer/>
   
     </LandingLayout>
   );

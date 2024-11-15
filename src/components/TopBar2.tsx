@@ -27,7 +27,7 @@ export default function TopBar() {
       </div>
 
       {/* Centered Logo Container */}
-      <div className="flex-1 lg:flex-none flex justify-center items-center">
+      <div className="flex-1 md:flex-none flex justify-center items-center">
         <Image
           src="/images/LOGODARK.png" // Static logo path for simplicity
           alt="Logo"
@@ -38,7 +38,7 @@ export default function TopBar() {
       </div>
 
       {/* Desktop Navigation Links */}
-      <nav className="hidden md:flex w-1/3 justify-end items-center space-x-6">
+      <nav className="hidden md:flex w-1/3 justify-end items-center space-x-4 lg:space-x-6">
         <Link href="/#home" className="hover:text-yellow-500 transition">
           Home
         </Link>
@@ -86,7 +86,7 @@ export default function TopBar() {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-gray-900 text-white p-4 shadow-lg rounded-lg z-50">
+        <div className="block absolute top-16 left-0 w-full bg-gray-900 text-white p-4 shadow-lg rounded-lg z-50">
           <Link href="/#home" className="block px-4 py-2 hover:bg-black rounded">
             Home
           </Link>

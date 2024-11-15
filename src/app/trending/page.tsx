@@ -5,7 +5,7 @@ import TrendingBar from '../../components/TrendingBar';
 
 export default function DashboardPage({ isDarkMode }: { isDarkMode: boolean }) {
   return (
-    <div className={`dashboard min-h-screen ${isDarkMode ? 'bg-dark-background text-white' : 'bg-light-background text-gray-800'} font-sans`}>
+    <div className={`dashboard mt-[6vh] min-h-screen ${isDarkMode ? 'bg-dark-background text-white' : 'bg-light-background text-gray-800'} font-sans`}>
       <TrendingBar isDarkMode={isDarkMode} />
       <div className="flex w-full">
         {/* Left Ad Sidebar */}

@@ -24,9 +24,9 @@ const Sidebar = ({
 
   return (
     <div
-      className={`fixed top-0 h-screen transition-all duration-300 z-10 flex flex-col ${
+      className={`fixed top-0 h-screen transition-all duration-300 z-50 flex flex-col ${
         isDarkMode ? "bg-[#090909] text-white" : "bg-[#f5f5f5] text-black"
-      } ${isOpen ? "md:w-64 w-full md:left-0 left-auto left-0" : "md:w-16 w-16 md:left-0 left-auto left-0"}
+      } ${isOpen ? "md:w-64 w-full left-0" : "md:w-16 w-16 md:left-0 left-0"}
       transition-colors duration-500`}
     >
       {/* Desktop Toggle Button */}
