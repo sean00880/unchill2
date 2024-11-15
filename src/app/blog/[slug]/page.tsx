@@ -2,13 +2,15 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-interface BlogPostProps {
+// Use a type to align with the PageProps expected by Next.js
+type BlogPostPageProps = {
   params: { slug: string };
-}
+};
 
-export default async function BlogPost({ params }: BlogPostProps) {
-  // Ensure `params` is awaited if it comes from an asynchronous function
-  const { slug } = await params;
+// Ensure the function is marked as async if needed
+export default function BlogPost({ params }: BlogPostPageProps) {
+  // Access `slug` directly from `params`
+  const { slug } = params;
 
   const posts = [
     {
@@ -124,7 +126,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const postContent = posts.find((post) => post.href === slug);
 
   if (!postContent) {
-    return notFound(); // Use return here to ensure the function exits properly
+    return notFound(); // Ensure the function exits when no content is found
   }
 
   return (
