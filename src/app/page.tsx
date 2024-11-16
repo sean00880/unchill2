@@ -223,7 +223,7 @@ const HomePage: React.FC = () => {
     <div className="content-container p-6 bg-white text-black rounded-lg shadow-lg glassmorphism-effect animate-fade-in">
       {activeTab === 'blog' ? (
         <div>
-          <h3 className="text-yellow-500 font-semibold mb-4 text-white">Explore the Latest from MemeLinked</h3>
+          <h3 className="text-yellow-500 font-semibold mb-4">Explore the Latest from MemeLinked</h3>
           <p className="mb-4 text-white">
             Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked. Discover how the community is thriving, find expert tips, and learn more about our ecosystem&apos;s innovations.
           </p>
@@ -240,8 +240,8 @@ const HomePage: React.FC = () => {
         </div>
       ) : (
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Comprehensive Documentation</h3>
-          <p className="mb-4">
+          <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
+          <p className="mb-4 text-white">
             Access all the essential information, guides, and technical details you need to make the most out of MemeLinked&apos;s platform. From onboarding to advanced features, we have everything covered.
           </p>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
