@@ -149,16 +149,18 @@ const HomePage: React.FC = () => {
         {[
           {
             phase: 'Phase 1: Project Launch',
-            description: 'Begin with the development and initial rollout of the MemeLinked project, featuring fundamental DeFi tools and interactive community engagement. Execute community onboarding campaigns and deploy essential utilities for staking and rewards.'
+            description: 'Begin with the development and initial rollout of the MemeLinked project, featuring fundamental DeFi tools and interactive community engagement. Execute community onboarding campaigns and deploy essential utilities around community exploration and growth in Defi.'
           },
           {
-            phase: 'Phase 2: Platform Launch',
+            phase: 'Phase 2: Marketing & Centralized Exchanges',
+            description: 'Expand MemeLinked’s presence through targeted marketing campaigns and secure listings on top cryptocurrency exchanges. Promote the platform with influencer collaborations, social media campaigns, and AMA sessions to amplify community awareness.'
+          }
+          ,
+          {
+            phase: 'Phase 3: Platform Launch',
             description: 'Launch the full MemeLinked platform, complete with user accounts, project listings, and enhanced social interaction tools. Incorporate user feedback for continuous improvements and host activities like polls and member spotlights to encourage active participation.'
           },
-          {
-            phase: 'Phase 3: Marketing & Tier One Listings',
-            description: 'Expand MemeLinked’s presence through targeted marketing campaigns and secure listings on top cryptocurrency exchanges. Promote the platform with influencer collaborations, social media campaigns, and AMA sessions to amplify community awareness.'
-          },
+          
           {
             phase: 'Phase 4: Feature Expansion and GameFi Introduction',
             description: 'Enhance user profiles and dashboards with advanced features. Introduce GameFi with MonkeyKongRacing for interactive gameplay that adds value to the ecosystem. Implement community challenges and reward systems to incentivize active participation and maintain user interest.'
