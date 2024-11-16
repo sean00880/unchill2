@@ -106,9 +106,9 @@ const HomePage: React.FC = () => {
 
     {/* Image Section */}
     <div className="relative flex justify-center items-center self-center order-1 lg:order-2">
-      <div className="image-container w-full md:w-auto rounded-lg overflow-hidden shadow-2xl h-[80%] border-4 border-white border-opacity-50 bg-gradient-to-b from-transparent to-gray-900">
+      <div className="image-container w-full md:w-auto rounded-lg overflow-hidden h-[80%] ">
         <Image
-          src="/images/ML1.webp"
+          src="/images/ML.gif"
           alt="Luxurious Shiba Inu"
           width={500}
           height={400}
