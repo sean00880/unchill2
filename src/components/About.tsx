@@ -47,8 +47,47 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
           </div>
 
           {/* Right Container for Animated Pentagon */}
-          <div
-            className={`w-full md:w-1/2 relative flex justify-center items-center ${isHovered ? 'paused-animation' : 'animate-spin-slow'}`}
+          
+        </div>
+
+        {/* Content for Tabs */}
+        <div className="flex mt-8 flex-col md:flex-row">
+          <aside className="flex-none w-full md:w-48 mb-4 md:mb-0 md:mr-4">
+            <button
+              className={`tab-button w-full px-4 py-2 my-2 rounded-sm text-left ${
+                aboutActiveTab === 'defi' ? 'bg-[#090909] italic text-white' : 'bg-gray-700 text-white hover:bg-gray-900'
+              }`}
+              onClick={() => setAboutActiveTab('defi')}
+            >
+              DeFi Social Network
+            </button>
+            <button
+              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
+                aboutActiveTab === 'gamefi' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
+              }`}
+              onClick={() => setAboutActiveTab('gamefi')}
+            >
+              GameFi
+            </button>
+            <button
+              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
+                aboutActiveTab === 'memes' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
+              }`}
+              onClick={() => setAboutActiveTab('memes')}
+            >
+              Memes
+            </button>
+          </aside>
+          <div className="flex-grow bg-[#090909] p-2 rounded-lg text-white">
+            {aboutActiveTab === 'defi' && (
+              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
+                <h3 className="text-3xl font-bold text-yellow-500 mb-4">DeFi Social Network</h3>
+                <p className="text-gray-300">
+                  MemeLinked's social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
+                </p>
+                <div className="flex-col xl:flex-row flex items-center">
+                <div
+            className={`w-full my-20 md:w-1/2 relative flex justify-center items-center ${isHovered ? 'paused-animation' : 'animate-spin-slow'}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -95,43 +134,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
 
 
           </div>
-        </div>
-
-        {/* Content for Tabs */}
-        <div className="flex mt-8">
-          <aside className="flex-none w-full md:w-48 mb-4 md:mb-0 md:mr-4">
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 rounded-sm text-left ${
-                aboutActiveTab === 'defi' ? 'bg-[#090909] italic text-white' : 'bg-gray-700 text-white hover:bg-gray-900'
-              }`}
-              onClick={() => setAboutActiveTab('defi')}
-            >
-              DeFi Social Network
-            </button>
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
-                aboutActiveTab === 'gamefi' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
-              }`}
-              onClick={() => setAboutActiveTab('gamefi')}
-            >
-              GameFi
-            </button>
-            <button
-              className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
-                aboutActiveTab === 'memes' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
-              }`}
-              onClick={() => setAboutActiveTab('memes')}
-            >
-              Memes
-            </button>
-          </aside>
-          <div className="flex-grow bg-[#090909] p-4 md:p-6 rounded-lg text-white">
-            {aboutActiveTab === 'defi' && (
-              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
-                <h3 className="text-3xl font-bold text-yellow-500 mb-4">DeFi Social Network</h3>
-                <p className="text-gray-300">
-                  MemeLinked's social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
-                </p>
                 <Image
                   src="/images/ML1.webp"
                   alt="DeFi Social Network"
@@ -139,22 +141,59 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
                   width={400}
                   height={250}
                 />
+                
+                </div>
               </div>
             )}
             {aboutActiveTab === 'gamefi' && (
-              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
-                <h3 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4">GameFi</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  Our GameFi integration, highlighted by MonkeyKongRacing, delivers engaging and immersive experiences to the MSI ecosystem. This feature allows users to enjoy interactive gameplay while contributing to the community&apos;s overall value and entertainment.
-                </p>
-                <Image
-                  src="/images/gamefi.png"
-                  alt="GameFi"
-                  className="mt-4 rounded-lg shadow-lg glassmorphism-effect animate-fade-in w-full max-w-md"
-                  width={400}
-                  height={250}
-                />
-              </div>
+             <div>
+             {/* Row 1 */}
+             <div className="glassmorphism-effect p-6 mb-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center md:items-start">
+               <div className="md:w-1/2 md:pr-8 mb-4 md:mb-0">
+                 <h3 className="text-3xl font-bold text-yellow-500 mb-4">Introducing TAP to EARN</h3>
+                 <p className="text-gray-300">
+                   $MSI is about to launch TAP to EARN mini-games, offering a new way for users to earn $MSI tokens and future
+                   partner tokens. These games are designed to engage the community and introduce a new dimension of fun.
+                 </p>
+               </div>
+               <div className="md:w-1/2">
+                 <Image
+                   src="/images/gamefi.png"
+                   alt="TAP to EARN"
+                   width={400}
+                   height={250}
+                   className="rounded-lg shadow-lg glassmorphism-effect2"
+                 />
+               </div>
+             </div>
+
+             {/* Row 2 */}
+             <div className="glassmorphism-effect2 border-white p-6 mb-8 rounded-lg shadow-lg flex flex-col md:flex-row-reverse items-center md:items-start">
+               <div className="md:w-1/2 md:pl-8 mb-4 md:mb-0">
+                 <h3 className="text-3xl font-bold text-yellow-500 mb-4">How TAP to EARN Will Work</h3>
+                 <ul className="list-decimal list-inside text-gray-300">
+                   <li className="mb-2">
+                     <strong>Simple Yet Addictive Games</strong>: These mini-games are quick, engaging, and easy to play.
+                   </li>
+                   <li className="mb-2">
+                     <strong>Marketing Missions</strong>: Complete missions tied to MSI's marketing efforts for rewards.
+                   </li>
+                   <li>
+                     <strong>Earn $MSI and Partner Tokens</strong>: Complete missions to earn $MSI and future partner tokens.
+                   </li>
+                 </ul>
+               </div>
+               <div className="md:w-1/3 row">
+                 <Image
+                   src="/images/gamefi.gif"
+                   alt="TAP to EARN Features"
+                   width={200}
+                   height={250}
+                   className="rounded-lg self-center shadow-lg"
+                 />
+               </div>
+             </div>
+           </div>
             )}
             {aboutActiveTab === 'memes' && (
               <div>

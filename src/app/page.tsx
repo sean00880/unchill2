@@ -45,11 +45,12 @@ const HomePage: React.FC = () => {
 
         {/* Social Icons Section */}
         <div className="mt-6 bg-black/50 backdrop-blur-lg socials-container p-4 rounded-xl shadow-lg flex justify-center space-x-4">
-         <Link href="https://x.com/MemeLinked"> <Image src="/icons/x.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" /></Link>
-          <Image src="/icons/telegram.png" width={50} height={50} alt="MemeLinked Telegram" className="socials border-2 border-white cover rounded-full" />
-          <Image src="/icons/dextools.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" />
-          <Image src="/icons/dexscreener.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white cover rounded-full" />
-          <Image src="/icons/linktree.png" width={50} height={50} alt="Social Icon 1" className="socials border-2 border-white bg-white cover rounded-full" />
+         <Link href="https://x.com/MemeLinked"> <Image src="/icons/x.png" width={50} height={50} alt="MemeLinked X Profile" className="socials border-2 border-white cover rounded-full" /></Link>
+          <Image src="/icons/telegram.png" width={50} height={50} alt="MemeLinked Telegram Profile" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/dextools.png" width={50} height={50} alt="MemeLinked DexTools Profile" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/dexscreener.png" width={50} height={50} alt="MemeLinked DexScreener Profile" className="socials border-2 border-white cover rounded-full" />
+          <Image src="/icons/linktree.png" width={50} height={50} alt="MemeLinked LinkTree Profile" className="socials border-2 border-white bg-white cover rounded-full" />
+          <Image src="/icons/TickerTrending.jpg" width={50} height={50} alt="MemeLinked DexScreener Profile" className="socials border-2 border-white cover rounded-full" />
         </div>
       </div>
     </section>
@@ -222,8 +223,8 @@ const HomePage: React.FC = () => {
     <div className="content-container p-6 bg-white text-black rounded-lg shadow-lg glassmorphism-effect animate-fade-in">
       {activeTab === 'blog' ? (
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Explore the Latest from MemeLinked</h3>
-          <p className="mb-4">
+          <h3 className="text-yellow-500 font-semibold mb-4 text-white">Explore the Latest from MemeLinked</h3>
+          <p className="mb-4 text-white">
             Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked. Discover how the community is thriving, find expert tips, and learn more about our ecosystem&apos;s innovations.
           </p>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
