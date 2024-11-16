@@ -12,8 +12,8 @@ const HomePage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('blog'); // This is for the Blog/Documentation section
   const images = [
-    '/images/default_logo.png',
-    '/images/default_logo.png',
+    '/images/ML4.png',
+    '/images/ML5.png',
     '/images/default_logo.png',
     '/images/default_logo.png',
     '/images/default_logo.png',
@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
           <span className="animate-glitch2">LINKED</span>
         </h1>
         <p className="text-lg mb-6">
-          A DeFi project on Ethereum, part of the Monkey Shit Inu ecosystem, where memes meet decentralized finance.
+          A DeFi project on Ethereum, part of the Monkey Shit Inu ecosystem, where memes meet Social Media.
         </p>
         <div className="bg-yellow-500 text-black px-4 py-2 rounded-md mb-2 hover:bg-yellow-600 cursor-pointer">
           Official Contract Address: <span className="font-mono">0xMemeLinkedContractAddress</span>
@@ -84,7 +84,7 @@ const HomePage: React.FC = () => {
             <strong className="text-yellow-500">Sell:</strong> 4%
           </p>
           <p className="mt-2 text-sm text-gray-200">
-            The 4% sell tax is split evenly for marketing (2%) and development (2%) to support ongoing growth.
+            The 4% sell tax is split evenly for marketing (2%) and development (2%) to support ongoing growth of the <Link href="https://monkeyshitinu.com"><span className='MSI'>MSI</span> (<span className='MonkeyShitInu'>Monkey Shit Inu</span>)</Link> ecosystem.
           </p>
         </div>
       </div>

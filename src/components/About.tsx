@@ -1,4 +1,4 @@
-"use client";
+"client";
 import React, { useState } from 'react';
 import Image from 'next/image';
 
@@ -9,10 +9,19 @@ interface AboutSectionProps {
 const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
   const [selectedImage, setSelectedImage] = useState(images[0] || '/images/default_logo.png');
   const [aboutActiveTab, setAboutActiveTab] = useState('defi');
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleImageClick = (image: string) => {
     setSelectedImage(image);
   };
+
+  const icons = [
+    { src: '/icons/influencer.png', alt: 'Influencer Profiles', tooltip: 'Create and manage profiles to enhance visibility.' },
+    { src: '/icons/feed.png', alt: 'Public Feed', tooltip: 'Stay updated with the latest posts and discussions.' },
+    { src: '/icons/verified2.png', alt: 'Exclusive Membership', tooltip: 'Gain exclusive access as a verified member.' },
+    { src: '/icons/boost.png', alt: 'Merit-Based Boosts', tooltip: 'Boost your profile based on your contributions.' },
+    { src: '/icons/ads.png', alt: 'Constant Ads', tooltip: 'Promote content through constant ad placements.' },
+  ];
 
   return (
     <section className="about-section bg-[#e0e0e0] text-black py-16 px-4 md:px-8">
@@ -38,37 +47,53 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
           </div>
 
           {/* Right Container for Animated Pentagon */}
-          <div className="w-full md:w-1/2 relative flex justify-center items-center">
-            <div className="relative w-[300px] h-[300px] flex items-center justify-center">
-              {/* Central Laptop Image */}
-              <Image
-                src="/images/default_logo.jpg"
-                alt="Laptop Displaying App"
-                className="absolute w-[150px] h-[100px] animate-pulse"
-                width={150}
-                height={100}
-              />
+          <div
+            className={`w-full md:w-1/2 relative flex justify-center items-center ${isHovered ? 'paused-animation' : 'animate-spin-slow'}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+<div className="pentagon-container relative flex items-center justify-center">
+  {/* Central Main Image */}
+  <Image
+    src="/images/default_logo.jpg"
+    alt="Central Display"
+    className="z-10 w-[150px] h-[150px] rounded-full" // Added z-index and rounded style
+    width={150}
+    height={150}
+  />
 
-              {/* Pentagon with Fading Icons */}
-              {Array.from({ length: 5 }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`absolute w-[40px] h-[40px] rounded-full animate-fade-in-${index + 1} transition-opacity`}
-                  style={{
-                    transform: `rotate(${72 * index}deg) translate(120px) rotate(-${72 * index}deg)`,
-                    opacity: 0.8,
-                  }}
-                >
-                  <Image
-                    src={`/images/icon${index + 1}.png`}
-                    alt={`Icon ${index + 1}`}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                </div>
-              ))}
-            </div>
+  {/* Neon Ring */}
+  <div className="neon-ring absolute w-[300px] h-[300px] rounded-full z-0"></div>
+
+  {/* Icons forming a static pentagon layout */}
+  <div className="icon-orbit-container absolute w-full h-full flex items-center justify-center z-10">
+    {icons.map((icon, index) => (
+      <div
+        key={index}
+        className="icon-container absolute group"
+        style={{
+          transform: `rotate(${72 * index}deg) translate(130px) rotate(-${72 * index}deg)`, // Position icons in a pentagon
+        }}
+      >
+        <Image
+          src={icon.src}
+          alt={icon.alt}
+          width={40}
+          height={40}
+          className="rounded-full shadow-xl transition-transform duration-300 group-hover:scale-110"
+        />
+        <div
+          className="tooltip absolute top-[110%] left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 z-50 transition-opacity duration-300 p-2 bg-white/80 rounded-lg shadow-lg backdrop-blur-sm"
+        >
+          <span className="text-xs text-black">{icon.tooltip}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+
           </div>
         </div>
 
@@ -101,14 +126,14 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
             </button>
           </aside>
           <div className="flex-grow bg-[#090909] p-4 md:p-6 rounded-lg text-white">
-          {aboutActiveTab === 'defi' && (
-                <div className="relative bg-[#090909] p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+            {aboutActiveTab === 'defi' && (
+              <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
                 <h3 className="text-3xl font-bold text-yellow-500 mb-4">DeFi Social Network</h3>
                 <p className="text-gray-300">
                   MemeLinked's social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
                 </p>
                 <Image
-                  src="/images/ML1.jpg"
+                  src="/images/ML1.webp"
                   alt="DeFi Social Network"
                   className="mt-4 rounded-lg shadow-lg glassmorphism-effect animate-fade-in"
                   width={400}
@@ -116,8 +141,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
                 />
               </div>
             )}
-       
-          {aboutActiveTab === 'gamefi' && (
+            {aboutActiveTab === 'gamefi' && (
               <div className="glassmorphism-effect p-4 md:p-6 rounded-lg shadow-lg">
                 <h3 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4">GameFi</h3>
                 <p className="text-gray-300 text-sm md:text-base">
