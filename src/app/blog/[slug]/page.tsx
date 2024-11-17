@@ -98,7 +98,7 @@ const posts = [
   </div>
   <h3 className="text-3xl font-semibold mt-8 mb-4 text-white">The Future of</h3>
   <div className="w-1/2 h-[2px] bg-yellow-500 mb-4"></div>
-  <Image src="/images/LOGODARK.png" width={500} height={500} />
+  <Image src="/images/LOGODARK.png" width={500} height={500} alt="MemeLinkedLogo" />
 
   <p className="text-lg text-gray-200">
     MemeLinked's roadmap includes enhanced social features, deeper DeFi tool integration, and strategic partnerships
@@ -196,7 +196,7 @@ const posts = [
 
           <h3 className="text-3xl font-semibold mt-8 mb-4 text-white">The Future of MemeLinked's Gamefi Ecosystem</h3>
           <div className="w-1/2 h-[2px] bg-yellow-500 mb-4"></div>
-          <Image src="/images/ML8.png" width={500} height={500} />
+          <Image src="/images/ML8.png" width={500} height={500}alt="Future of MemeLinked" />
 
           <p className="text-lg text-gray-200">
             The future of GameFi in MemeLinked is bright, with plans to integrate more complex gaming mechanics, strategic partnerships, and cross-platform functionalities. These enhancements aim to create an environment where users can seamlessly navigate between gaming, earning, and engaging with other community members. As the ecosystem evolves, MemeLinked's commitment to innovation ensures that it remains at the forefront of the GameFi movement within the DeFi space.
