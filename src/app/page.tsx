@@ -294,20 +294,21 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-<section className="cta-section bg-[#090909] text-white py-16">
+<section className="cta-section bg-gradient-to-b from-[#090909] via-[whitesmoke] to-[#ffffff] text-white py-16">
         <div className="text-center items-center flex flex-col">
         <Image
       src="/images/MemeLinked.png"
       alt="MemeLinked Graphic"
-      className="w-100 h-100 rounded-lg shadow-lg bg-opacity-80 backdrop-blur-md"
+      className="w-100 h-100 rounded-lg  bg-opacity-80"
       width={400}
       height={400}
     />
-          <h2 className="text-3xl font-bold mb-4" >Join the Future of Community-Driven DeFi</h2>
+          <h2 className="text-3xl font-bold mb-4 text-black" >Join the Future of Community-Driven DeFi</h2>
           
-          <button className="px-8 py-4 bg-yellow-500 text-black rounded-lg shadow hover:bg-yellow-600">
-            Get Started
+          <button className="px-8 py-4 bg-yellow-500 text-black rounded-lg  shadow hover:bg-yellow-600">
+            Coming Soon
           </button>
+          <h5 className='text-black italic font-semibold'>**[Anticipated Launch: 2025]**</h5>
         </div>
        
       </section>
