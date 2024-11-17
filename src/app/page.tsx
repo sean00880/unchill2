@@ -31,8 +31,8 @@ const HomePage: React.FC = () => {
     '/images/ML4.png',
     '/images/ML5.png',
     '/images/ML6.png',
-    '/images/default_logo.png',
-    '/images/default_logo.png',
+    '/images/ML8.png',
+    '/images/ML7.png',
   ];
 
 
