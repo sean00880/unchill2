@@ -97,7 +97,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
           <aside className="flex-none w-full md:w-48 mb-4 md:mb-0 md:mr-4">
             <button
               className={`tab-button w-full px-4 py-2 my-2 rounded-sm text-left ${
-                aboutActiveTab === 'defi' ? 'bg-[#090909] italic text-white' : 'bg-gray-700 text-white hover:bg-gray-900'
+                aboutActiveTab === 'defi' ? 'bg-yellow-600 italic glassmorphism-effect text-black  rounded-[30px]' : 'bg-black rounded-[10px] text-white hover:bg-yellow-600'
               }`}
               onClick={() => setAboutActiveTab('defi')}
             >
@@ -105,7 +105,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
             </button>
             <button
               className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
-                aboutActiveTab === 'gamefi' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
+                aboutActiveTab === 'gamefi' ? 'bg-yellow-600 glassmorphism-effect text-black italic rounded-[30px]' : 'bg-black rounded-[10px] text-white hover:bg-yellow-600'
               }`}
               onClick={() => setAboutActiveTab('gamefi')}
             >
@@ -113,7 +113,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
             </button>
             <button
               className={`tab-button w-full px-4 py-2 my-2 text-left rounded-sm ${
-                aboutActiveTab === 'memes' ? 'bg-[#090909] text-white italic' : 'bg-gray-700 text-white hover:bg-gray-900'
+                aboutActiveTab === 'memes' ? 'bg-yellow-600 glassmorphism-effect text-black italic rounded-[30px]' : 'bg-black rounded-[10px] text-white hover:bg-yellow-600'
               }`}
               onClick={() => setAboutActiveTab('memes')}
             >
