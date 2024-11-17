@@ -12,13 +12,13 @@ const posts = [
     title: 'How MemeLinked Integrates DeFi and Social Networking',
     href: '/blog/defi-social-networking',
     description: 'Understand the unique approach that blends DeFi and social interactions...',
-    previewImage: '/images/ML2.webp',
+    previewImage: '/images/ML7.png',
   },
   {
     title: "GameFi's Role in the MemeLinked Ecosystem",
     href: '/blog/gamefi-role',
     description: 'Explore how GameFi enhances user engagement and contributes to our growth...',
-    previewImage: '/images/ML2.webp',
+    previewImage: '/images/ML6.png',
   },
   // Add more blog posts with preview images here
 ];
@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
         {/* Total Supply */}
         <div className="bg-[#090909] p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
           <h3 className="text-2xl font-semibold mb-2">Total Supply</h3>
-          <p className="text-3xl font-bold text-yellow-500">1 Trillion</p>
+          <p className="text-3xl font-bold text-yellow-500">1 Trillion</p><span>$MK</span>
           <p className="mt-2 text-sm text-gray-200">
             Strategically set to ensure a balanced ecosystem and sustainable growth.
           </p>
@@ -254,9 +254,9 @@ const HomePage: React.FC = () => {
                 </p>
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   {posts.map((post, index) => (
-                    <div key={index} className="p-4 bg-gray-100 rounded-lg shadow-md">
+                    <div key={index} className="p-4 bg-gray-100 flex flex-col items-center justify-center rounded-lg shadow-md">
                       <Link href={post.href}>
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center self-center justify-center">
                           <Image
                             src={post.previewImage}
                             alt={`${post.title} preview`}
@@ -274,9 +274,21 @@ const HomePage: React.FC = () => {
               </div>
             ) : (
               <div>
-                <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
-                {/* Documentation content here */}
-              </div>
+          <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
+          <p className="mb-4 text-white">
+            Access all the essential information, guides, and technical details you need to make the most out of MemeLinked&apos;s platform. From onboarding to advanced features, we have everything covered.
+          </p>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+              <h4 className="text-xl font-bold mb-2">Getting Started Guide</h4>
+              <p className="text-gray-700">Step-by-step instructions to begin your journey with MemeLinked...</p>
+            </div>
+            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+              <h4 className="text-xl font-bold mb-2">API & Developer Tools</h4>
+              <p className="text-gray-700">Detailed information on how to integrate with our platform and leverage its power...</p>
+            </div>
+          </div>
+        </div>
             )}
           </div>
         </div>

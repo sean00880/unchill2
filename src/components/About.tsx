@@ -27,27 +27,69 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
     <section className="about-section bg-[#e0e0e0] text-black py-16 px-4 md:px-8">
       <div className="max-w-6xl mx-auto flex flex-col">
         <h2 className="text-4xl font-bold mb-6 text-center landing-heading">About</h2>
-        <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4 left-0"></div>
+        <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-full left-0"></div>
         <p className="text-lg mb-4 text-center md:text-left">
           MemeLinked is more than just a token; it&apos;s a unique blend of meme culture and utility within the MSI ecosystem.
           Founded by the visionary Pablo Cro, MemeLinked offers an engaging social network that fuels organic growth and
           exposure for real projects. Our platform bridges the gap between fun and functionality, empowering users to
           connect in a space where communities thrive and opportunities abound.
         </p>
-        <div className="flex flex-col md:flex-row mt-8 gap-6">
-          {/* Left Container for Image */}
-          <div className="w-full md:w-1/2 flex justify-center">
+       
+
+          {/* Right Container for Animated Pentagon */}
+          <div className="about-interactive w-full bg-opacity-40 p-3 rounded-xl backdrop-blur-md glassmorphism-effect3 flex flex-row space-y-8 shadow-lg text-white">
+      {/* Title */}
+
+      <div className="w-full flex scale-75 justify-center">
             <Image
               src="/images/ML3.png"
               alt="DeFi Social Network"
-              className="rounded-lg shadow-lg glassmorphism-effect animate-fade-in"
+              className="rounded-lg animate-fade-in w-full h-full"
               width={500}
               height={400}
             />
           </div>
-
-          {/* Right Container for Animated Pentagon */}
+      <div className="flex flex-col mt-8 gap-3">
+          {/* Left Container for Image */}
           
+      <h2 className="text-3xl font-bold text-center neon-text">Explore the Scope of MemeLinked</h2>
+      {/* Project Features */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 holographic-effect">
+        {/* DeFi Social Network */}
+      
+        <div className="feature-card p-4 bg-black/70 border border-yellow-500 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+          <h3 className="text-xl font-semibold text-yellow-500 mb-2">DeFi Social Network</h3>
+          <p className="text-sm text-gray-300">
+            Connect, engage, and share financial insights with like-minded users on an innovative DeFi-focused social platform.
+          </p>
+        </div>
+        {/* GameFi */}
+        <div className="feature-card p-4 bg-black/70 border border-yellow-500 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+          <h3 className="text-xl font-semibold text-yellow-500 mb-2">GameFi</h3>
+          <p className="text-sm text-gray-300">
+            Experience GameFi with interactive mini-games like MonkeyKongRacing, offering new ways to earn and engage.
+          </p>
+          <ul className="list-disc pl-4 mt-2 text-gray-300 text-sm">
+            <li>Simple Yet Addictive Games</li>
+            <li>Marketing Missions</li>
+            <li>Earn MSI and Partner Tokens</li>
+          </ul>
+        </div>
+        {/* Memes */}
+        <div className="feature-card p-4 bg-black/70 border border-yellow-500 rounded-lg shadow-md transform hover:scale-105 transition-transform">
+          <h3 className="text-xl font-semibold text-yellow-500 mb-2">Memes</h3>
+          <p className="text-sm text-gray-300">
+            Dive into a community-driven culture with meme creation, contests, and viral challenges that amplify engagement.
+          </p>
+        </div>
+      </div>
+      {/* Holographic Visual Element */}
+      <div className="holographic-overlay w-full mt-4 p-4 bg-gradient-to-r from-yellow-500 via-transparent to-yellow-500 animate-glow rounded-lg shadow-lg">
+        <p className="text-center font-mono text-sm text-black">
+          Join MemeLinked and explore the future where memes, finance, and gaming merge seamlessly into one ecosystem.
+        </p>
+      </div>
+    </div>
         </div>
 
         {/* Content for Tabs */}
@@ -85,7 +127,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
                 <p className="text-gray-300">
                   MemeLinked's social network platform provides a space where users can engage, connect, and grow within the DeFi community. With interactive features and project spotlights, users experience an innovative approach to organic exposure and community-driven growth.
                 </p>
-                <div className="flex-col xl:flex-row flex items-center">
+                <div className="flex-col lg:flex-row flex items-center">
                 <div
             className={`w-full my-20 md:w-1/2 relative flex justify-center items-center ${isHovered ? 'paused-animation' : 'animate-spin-slow'}`}
             onMouseEnter={() => setIsHovered(true)}

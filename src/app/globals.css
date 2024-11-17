@@ -504,7 +504,7 @@ background-color: none!important;
 }
 
 img{
-  height: 100%;
+  height: auto;
 }
 
 
@@ -761,6 +761,10 @@ table td {
   background-color: #ffcc00;
 }
 
+Img{
+  object-fit: contain;
+}
+
 .phase-icon {
   position: absolute;
   left: -1.5rem;
@@ -843,3 +847,31 @@ table td {
   border: 1px solid #eeeeee;
 }
 
+
+
+.neon-text {
+  color: #000000;
+  text-shadow: 0 0 5px #f0f0f0, 0 0 10px #eab308, 0 0 15px #eab308;
+}
+
+.glassmorphism-effect3 {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.holographic-effect {
+  border-radius: 10px;
+  background: linear-gradient(135deg, #000000, #4d4d4d);
+  animation: holographic-move 5s infinite alternate;
+  backdrop-filter: blur(10px);
+  padding: 10px;
+}
+
+@keyframes holographic-move {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
