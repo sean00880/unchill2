@@ -96,7 +96,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
         <div className="flex mt-8 flex-col md:flex-row">
           <aside className="flex-none w-full md:w-48 mb-4 md:mb-0 md:mr-4">
             <button
-              className={`tab-button w-full px-4 py-2 my-2 rounded-sm text-left ${
+              className={`tab-button w-full px-4 py-2 my-2 text-left ${
                 aboutActiveTab === 'defi' ? 'bg-yellow-600 italic glassmorphism-effect text-black  rounded-[30px]' : 'bg-black rounded-[10px] text-white hover:bg-yellow-600'
               }`}
               onClick={() => setAboutActiveTab('defi')}
