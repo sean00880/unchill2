@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
     <div className="relative flex justify-center items-center self-center order-1 lg:order-2">
       <div className="image-container w-full md:w-auto rounded-lg overflow-hidden h-[80%] ">
         <Image
-          src="/images/ML.gif"
+          src="/images/MK.png"
           alt="Luxurious Shiba Inu"
           width={500}
           height={400}
@@ -295,13 +295,21 @@ const HomePage: React.FC = () => {
       </section>
 
 <section className="cta-section bg-[#090909] text-white py-16">
-        <div className="text-center">
+        <div className="text-center items-center flex flex-col">
+        <Image
+      src="/images/MemeLinked.png"
+      alt="MemeLinked Graphic"
+      className="w-100 h-100 rounded-lg shadow-lg bg-opacity-80 backdrop-blur-md"
+      width={400}
+      height={400}
+    />
           <h2 className="text-3xl font-bold mb-4" >Join the Future of Community-Driven DeFi</h2>
+          
           <button className="px-8 py-4 bg-yellow-500 text-black rounded-lg shadow hover:bg-yellow-600">
             Get Started
           </button>
         </div>
-        
+       
       </section>
     
   <Footer/>
