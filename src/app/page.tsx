@@ -7,6 +7,22 @@ import Link from 'next/link';
 import Footer from '../components/Footer';
 import AboutSection from '../components/About';
 
+const posts = [
+  {
+    title: 'How MemeLinked Integrates DeFi and Social Networking',
+    href: '/blog/defi-social-networking',
+    description: 'Understand the unique approach that blends DeFi and social interactions...',
+    previewImage: '/images/ML2.webp',
+  },
+  {
+    title: "GameFi's Role in the MemeLinked Ecosystem",
+    href: '/blog/gamefi-role',
+    description: 'Explore how GameFi enhances user engagement and contributes to our growth...',
+    previewImage: '/images/ML2.webp',
+  },
+  // Add more blog posts with preview images here
+];
+
 const HomePage: React.FC = () => {
   
 
@@ -73,6 +89,13 @@ const HomePage: React.FC = () => {
           <p className="mt-2 text-sm text-gray-200">
             Strategically set to ensure a balanced ecosystem and sustainable growth.
           </p>
+          <Image
+          src="/images/ML.gif"
+          alt="Luxurious Shiba Inu"
+          width={300}
+          height={300}
+          className="w-full h-auto md:max-w-none transition-opacity duration-500 ease-in-out hover:opacity-100 parallax-effect"
+        />
         </div>
         {/* Transaction Tax */}
         <div className="bg-[#090909] p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
@@ -203,64 +226,61 @@ const HomePage: React.FC = () => {
       {/* Call-to-Action */}
 
       <section className="blog-doc-section bg-[#090909] text-white py-16 px-8">
-  <div className="max-w-6xl mx-auto items-center flex flex-col">
-    <h2 className="landing-heading text-4xl font-bold mb-4 text-center" data-text="Resources">
-      Resources
-    </h2>
-    <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4"></div>
-    <div className="tabs-container flex justify-center mb-8">
-      <button
-        className={`tab-button px-6 py-2 mx-2 rounded-sm ${activeTab === 'blog' ? 'bg-white text-black' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
-        onClick={() => setActiveTab('blog')}
-      >
-        Blog
-      </button>
-      <button
-        className={`tab-button px-6 py-2 mx-2 rounded-sm ${activeTab === 'documentation' ? 'bg-white text-black' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
-        onClick={() => setActiveTab('documentation')}
-      >
-        Documentation
-      </button>
-    </div>
-    <div className="content-container p-6 bg-white text-black rounded-lg shadow-lg glassmorphism-effect animate-fade-in">
-      {activeTab === 'blog' ? (
-        <div>
-          <h3 className="text-yellow-500 font-semibold mb-4">Explore the Latest from MemeLinked</h3>
-          <p className="mb-4 text-white">
-            Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked. Discover how the community is thriving, find expert tips, and learn more about our ecosystem&apos;s innovations.
-          </p>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="text-xl font-bold mb-2">How MemeLinked Integrates DeFi and Social Networking</h4>
-              <p className="text-gray-700">Understand the unique approach that blends DeFi and social interactions...</p>
-            </div>
-            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="text-xl font-bold mb-2">GameFi&apos;s Role in the MemeLinked Ecosystem</h4>
-              <p className="text-gray-700">Explore how GameFi enhances user engagement and contributes to our growth...</p>
-            </div>
+        <div className="max-w-6xl mx-auto items-center flex flex-col">
+          <h2 className="landing-heading text-4xl font-bold mb-4 text-center" data-text="Resources">
+            Resources
+          </h2>
+          <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4"></div>
+          <div className="tabs-container flex justify-center mb-8">
+            <button
+              className={`tab-button px-6 py-2 mx-2 rounded-sm ${activeTab === 'blog' ? 'bg-white text-black' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
+              onClick={() => setActiveTab('blog')}
+            >
+              Blog
+            </button>
+            <button
+              className={`tab-button px-6 py-2 mx-2 rounded-sm ${activeTab === 'documentation' ? 'bg-white text-black' : 'bg-gray-700 text-white hover:bg-gray-900'}`}
+              onClick={() => setActiveTab('documentation')}
+            >
+              Documentation
+            </button>
+          </div>
+          <div className="content-container p-6 bg-white text-black rounded-lg shadow-lg glassmorphism-effect animate-fade-in">
+            {activeTab === 'blog' ? (
+              <div>
+                <h3 className="text-yellow-500 font-semibold mb-4">Explore the Latest from MemeLinked</h3>
+                <p className="mb-4 text-white">
+                  Dive into our blog to stay informed about the latest updates, trends, and insights into the world of MemeLinked...
+                </p>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {posts.map((post, index) => (
+                    <div key={index} className="p-4 bg-gray-100 rounded-lg shadow-md">
+                      <Link href={post.href}>
+                        <div className="flex flex-col items-center">
+                          <Image
+                            src={post.previewImage}
+                            alt={`${post.title} preview`}
+                            width={400}
+                            height={250}
+                            className="rounded-md mb-3"
+                          />
+                          <h4 className="text-xl font-bold mb-2">{post.title}</h4>
+                        </div>
+                      </Link>
+                      <p className="text-gray-700">{post.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
+                {/* Documentation content here */}
+              </div>
+            )}
           </div>
         </div>
-      ) : (
-        <div>
-          <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
-          <p className="mb-4 text-white">
-            Access all the essential information, guides, and technical details you need to make the most out of MemeLinked&apos;s platform. From onboarding to advanced features, we have everything covered.
-          </p>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="text-xl font-bold mb-2">Getting Started Guide</h4>
-              <p className="text-gray-700">Step-by-step instructions to begin your journey with MemeLinked...</p>
-            </div>
-            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="text-xl font-bold mb-2">API & Developer Tools</h4>
-              <p className="text-gray-700">Detailed information on how to integrate with our platform and leverage its power...</p>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-</section>
+      </section>
 
 <section className="cta-section bg-[#090909] text-white py-16">
         <div className="text-center">
