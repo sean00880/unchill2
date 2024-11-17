@@ -28,13 +28,14 @@ export default function TopBar() {
 
       {/* Centered Logo Container */}
       <div className="flex-1 md:flex-none flex justify-center items-center">
+        <Link href="#">
         <Image
           src="/images/LOGODARK.png" // Static logo path for simplicity
           alt="Logo"
           width={240}
           height={40}
           className="glitch-effect"
-        />
+        /></Link>
       </div>
 
       {/* Desktop Navigation Links */}
