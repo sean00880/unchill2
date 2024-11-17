@@ -847,12 +847,15 @@ Img{
   border: 1px solid #eeeeee;
 }
 
-
-
-.neon-text {
-  color: #000000;
-  text-shadow: 0 0 5px #f0f0f0, 0 0 10px #eab308, 0 0 15px #eab308;
+.glassmorphism-effect4 {
+  background: rgb(12, 12, 12);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eeeeee;
 }
+
+
+
 
 .glassmorphism-effect3 {
   backdrop-filter: blur(10px);
@@ -873,5 +876,58 @@ Img{
   }
   to {
     background-position: 100% 50%;
+  }
+}
+
+.chart-container {
+  position: relative;
+  width: 340px;
+  height: 10vh;
+  left: 10vh;
+}
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  width: 15px;
+  border-radius: 5px;
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0), rgba(0, 255, 255, 1));
+  animation: glowUp 2s infinite alternate;
+}
+
+.bar:nth-child(1) {
+  left: 40px;
+  height: 40%;
+  animation-delay: 0s;
+}
+
+.bar:nth-child(2) {
+  left: 65px;
+  height: 60%;
+  animation-delay: 0.2s;
+}
+
+.bar:nth-child(3) {
+  left: 90px;
+  height: 80%;
+  animation-delay: 0.4s;
+}
+
+.bar:nth-child(4) {
+  left: 115px;
+  height: 100%;
+  animation-delay: 0.6s;
+}
+
+@keyframes glowUp {
+  0% {
+    transform: scaleY(0.8);
+    background: rgba(0, 255, 255, 0);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0);
+  }
+  100% {
+    transform: scaleY(1.2);
+    background: rgb(237, 208, 16);
+    box-shadow: 0 0 15px rgba(255, 183, 0, 0.874);
   }
 }

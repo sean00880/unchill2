@@ -37,7 +37,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
        
 
           {/* Right Container for Animated Pentagon */}
-          <div className="about-interactive w-full bg-opacity-40 p-3 rounded-xl backdrop-blur-md glassmorphism-effect3 flex flex-row space-y-8 shadow-lg text-white">
+          <div className="about-interactive w-full bg-opacity-40 p-3 rounded-xl backdrop-blur-md glassmorphism-effect4 flex flex-row space-y-8 shadow-lg text-white">
       {/* Title */}
 
       <div className="w-full flex scale-75 justify-center">
@@ -52,7 +52,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
       <div className="flex flex-col mt-8 gap-3">
           {/* Left Container for Image */}
           
-      <h2 className="text-3xl font-bold text-center neon-text">Explore the Scope of MemeLinked</h2>
+      <h2 className="text-3xl font-extralight text-center text-[#f7f7f7]">Explore the Scope of MemeLinked</h2>
       {/* Project Features */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 holographic-effect">
         {/* DeFi Social Network */}
@@ -84,7 +84,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
         </div>
       </div>
       {/* Holographic Visual Element */}
-      <div className="holographic-overlay w-full mt-4 p-4 bg-gradient-to-r from-yellow-500 via-transparent to-yellow-500 animate-glow rounded-lg shadow-lg">
+      <div className="holographic-overlay w-full mt-4 p-4 bg-gradient-to-r from-yellow-500 via-yellow-700 to-yellow-500 animate-glow rounded-lg shadow-lg">
         <p className="text-center font-mono text-sm text-black">
           Join MemeLinked and explore the future where memes, finance, and gaming merge seamlessly into one ecosystem.
         </p>

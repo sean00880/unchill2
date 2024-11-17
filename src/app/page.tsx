@@ -210,7 +210,7 @@ const HomePage: React.FC = () => {
   {/* Image at the bottom left */}
   <div className="lg:absolute bottom-0 lg:bottom-4 lg:left-4">
     <Image
-      src="/images/MK.png"
+      src="/images/roadmap.png"
       alt="MemeLinked Graphic"
       className="w-48 h-48 rounded-lg shadow-lg bg-opacity-80 backdrop-blur-md"
       width={192}
