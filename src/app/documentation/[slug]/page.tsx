@@ -1,5 +1,5 @@
 // src/app/documentation/[slug]/page.tsx
-'use client'; // Add this line to indicate that this is a client-side component
+'use client'; // Indicate that this is a client-side component
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import React from 'react';
@@ -10,106 +10,93 @@ const docs = [
     href: 'platform-overview',
     content: (
       <>
-        <div className="lg:ml-[26%] mt-[10vh] items-center justify-center flex flex-col p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg transition-transform hover:shadow-glow">
+        <section className="flex flex-col lg:ml-[25%] mt-[10vh] p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg">
+          <h1 className="text-5xl font-extrabold mb-4 text-white">MemeLinked Platform Overview</h1>
+          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
           <Image
             src="/images/platform-overview.png"
             alt="MemeLinked Platform Overview"
             width={1000}
             height={400}
             className="rounded-lg shadow-lg transform hover:scale-105 my-10 transition-transform duration-500"
-            style={{ boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)' }}
           />
-          <h1 className="text-5xl font-extrabold mb-4 text-white">MemeLinked Platform Overview</h1>
-          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
-          <p className="text-lg mb-6 text-gray-200">
-            MemeLinked brings together the best of decentralized finance (DeFi) and social networking, offering users a comprehensive platform to connect, engage, and leverage powerful financial tools within a community-driven ecosystem.
+          <p className="text-lg text-gray-200 mb-6">
+            The MemeLinked platform combines decentralized finance (DeFi) with social networking to create a
+            unique, collaborative ecosystem. This overview provides users with insights into the platform's core
+            functionalities, its role in the DeFi space, and how it empowers users to engage with DeFi tools
+            innovatively.
           </p>
-          <h3 className="text-3xl font-semibold mt-8 mb-4 text-white">Core Features of MemeLinked:</h3>
-          <div className="w-1/2 h-[2px] bg-yellow-500 mb-4"></div>
+          <h3 className="text-3xl font-semibold mb-4 text-white">Core Features:</h3>
           <ul className="list-disc ml-8 text-gray-200 text-lg space-y-2">
-            <li><strong>Community Engagement:</strong> Participate in discussions, join groups, and connect with like-minded DeFi enthusiasts.</li>
-            <li><strong>DeFi Tool Integration:</strong> Access portfolio tracking, analytics, and strategic insights within the platform.</li>
-            <li><strong>Influencer Spotlights:</strong> Discover trending influencers, view their profiles, and follow their DeFi insights.</li>
+            <li><strong>Social Engagement:</strong> A vibrant community where DeFi discussions and networking thrive.</li>
+            <li><strong>Portfolio Tools:</strong> Comprehensive tools for tracking and managing your DeFi investments.</li>
+            <li><strong>Interactive Profiles:</strong> Showcase your expertise and build trust within the DeFi community.</li>
           </ul>
-          <Image
-            src="/images/platform-features.png"
-            alt="Platform Features"
-            width={1000}
-            height={400}
-            className="rounded-lg shadow-lg transform hover:scale-105 my-10 transition-transform duration-500"
-            style={{ boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)' }}
-          />
-          <p className="text-lg mt-6 text-gray-200">
-            The platform's unique combination of social and financial tools empowers users to not only stay informed but also actively participate and grow within the DeFi space.
-          </p>
-        </div>
+        </section>
       </>
     ),
   },
   {
-    title: 'GameFi’s Role in the MemeLinked Ecosystem',
-    href: 'gamefi-role',
+    title: 'How to Navigate the MemeLinked dApp',
+    href: 'navigate-dapp',
     content: (
       <>
-        <div className="lg:ml-[26%] mt-[10vh] items-center justify-center flex flex-col p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg transition-transform hover:shadow-glow">
+        <section className="flex flex-col lg:ml-[25%] mt-[10vh] p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg">
           <h2 className="text-4xl font-bold mb-6 text-red-500">DETAILED DOCUMENTATION COMING SOON</h2>
+          <h1 className="text-5xl font-extrabold mb-4 text-white">How to Navigate the MemeLinked dApp</h1>
+          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
           <Image
-            src="/images/gamefi-overview.png"
-            alt="GameFi Role"
+            src="/images/navigate-dapp.png"
+            alt="Navigate the dApp"
             width={1000}
             height={400}
             className="rounded-lg shadow-lg transform hover:scale-105 my-10 transition-transform duration-500"
-            style={{ boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)' }}
           />
-          <h1 className="text-5xl font-extrabold mb-4 text-white">GameFi’s Role in the MemeLinked Ecosystem</h1>
-          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
-          <p className="text-lg mb-6 text-gray-200">
-            GameFi is an integral part of MemeLinked, bridging the gap between finance and entertainment. By incorporating engaging gameplay mechanics, MemeLinked encourages users to interact with the ecosystem in innovative ways.
+          <p className="text-lg text-gray-200 mb-6">
+            This section will soon provide comprehensive guidance on navigating the MemeLinked dApp, ensuring that users can make the most of its features for a seamless DeFi experience.
           </p>
-        </div>
+        </section>
       </>
     ),
   },
   {
-    title: 'The Future of Meme-Driven Finance',
-    href: 'meme-finance-future',
+    title: 'Security and Best Practices in MemeLinked',
+    href: 'security-best-practices',
     content: (
       <>
-        <div className="lg:ml-[26%] mt-[10vh] items-center justify-center flex flex-col p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg transition-transform hover:shadow-glow">
+        <section className="flex flex-col lg:ml-[25%] mt-[10vh] p-6 glassmorphism rounded-xl shadow-2xl backdrop-blur-lg">
+          <h1 className="text-5xl font-extrabold mb-4 text-white">Security and Best Practices in MemeLinked</h1>
+          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
           <Image
-            src="/images/meme-finance-future.png"
-            alt="Meme-Driven Finance"
+            src="/images/security-best-practices.png"
+            alt="Security Best Practices"
             width={1000}
             height={400}
             className="rounded-lg shadow-lg transform hover:scale-105 my-10 transition-transform duration-500"
-            style={{ boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)' }}
           />
-          <h1 className="text-5xl font-extrabold mb-4 text-white">The Future of Meme-Driven Finance</h1>
-          <div className="w-full h-[2px] bg-yellow-500 mb-6"></div>
-          <p className="text-lg mb-6 text-gray-200">
-            The intersection of memes and finance is rapidly evolving. MemeLinked is at the forefront, harnessing the viral nature of memes to drive community engagement and financial growth. The platform envisions a future where users can participate in a decentralized, meme-driven economy that balances fun with practical financial gains.
+          <p className="text-lg text-gray-200 mb-6">
+            Understanding the importance of security and following best practices is crucial for ensuring a safe
+            experience in the MemeLinked platform. This section details the strategies and guidelines for
+            maintaining user safety while engaging in DeFi activities.
           </p>
-          <h3 className="text-3xl font-semibold mt-8 mb-4 text-white">Key Future Developments:</h3>
+          <h3 className="text-3xl font-semibold mb-4 text-white">Best Practices:</h3>
           <ul className="list-disc ml-8 text-gray-200 text-lg space-y-2">
-            <li><strong>Community-Led Innovation:</strong> Users will have opportunities to propose and vote on platform updates.</li>
-            <li><strong>Expanded DeFi Integration:</strong> More tools to enhance financial decision-making and strategy within the platform.</li>
-            <li><strong>Strategic Partnerships:</strong> Collaborations with other DeFi projects to boost the ecosystem’s capabilities.</li>
+            <li><strong>Secure Authentication:</strong> Utilize secure login methods and enable 2FA where available.</li>
+            <li><strong>Portfolio Privacy:</strong> Ensure that your financial data remains private and secure.</li>
+            <li><strong>Phishing Awareness:</strong> Stay vigilant against potential scams and fraudulent activities.</li>
           </ul>
-          <p className="text-lg mt-6 text-gray-200">
-            By fostering a collaborative and engaging environment, MemeLinked continues to redefine the possibilities of meme-based financial platforms.
-          </p>
-        </div>
+        </section>
       </>
     ),
-  },
-  // Add more posts as needed...
+  }
+  // Add more documentation entries as needed...
 ];
 
 export default function DocumentationPage() {
   const params = useParams();
   const slug = params?.slug;
 
-  const docContent = docs.find((doc) => doc.href === slug);
+  const docContent = docs.find((doc) => doc.href.endsWith(slug));
 
   if (!docContent) {
     return notFound(); // Exit if no content found
