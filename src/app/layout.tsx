@@ -33,7 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   // Check if the current route is for the landing page, blog, or documentation
   const isLandingPage = pathname === '/';
-  const isDocumentationPage = pathname.startsWith('/blog') || pathname.startsWith('/documentation');
+  const isDocumentationPage = pathname.startsWith('/documentation');
+  const isBlogPage = pathname.startsWith('/blog');
 
   return (
     <Provider value={client}>
@@ -41,6 +42,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
           {isLandingPage ? (
             children
+          ) : isDocumentationPage ? (
+            <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
           ) : isDocumentationPage ? (
             <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
           ) : (

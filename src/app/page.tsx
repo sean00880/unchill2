@@ -256,10 +256,6 @@ const HomePage: React.FC = () => {
   </div>
 </section>
 
-
-
-
-
       {/* Call-to-Action */}
 
       <section className="blog-doc-section bg-[#090909] text-white py-16 px-8" id="resources">
