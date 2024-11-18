@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   // Check if the current route is for the landing page, blog, or documentation
   const isLandingPage = pathname === '/';
-  const isDocumentationPage = pathname.startsWith('/documentation');
+  const isDocumentationPage = pathname.startsWith('/docs');
   const isBlogPage = pathname.startsWith('/blog');
 
   return (
