@@ -7,6 +7,7 @@ import "./globals.css";
 import { usePathname } from 'next/navigation';
 import DefaultLayout from "../components/DefaultLayout"; // Main default layout
 import DocumentationLayout from "../components/DocumentationLayout"; // Layout for blog and documentation
+import DocumentationLayout2 from "../components/DocumentationLayout2"; 
 
 // Define local fonts
 const geistSans = localFont({
@@ -43,8 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {isLandingPage ? (
             children
           ) : isDocumentationPage ? (
-            <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
-          ) : isDocumentationPage ? (
+            <DocumentationLayout2 posts={posts}>{children}</DocumentationLayout2>
+          ) : isBlogPage ? (
             <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
           ) : (
             <DefaultLayout>{children}</DefaultLayout>
