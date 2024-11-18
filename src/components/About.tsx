@@ -1,4 +1,4 @@
-"client";
+"use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
 
@@ -24,7 +24,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ images }) => {
   ];
 
   return (
-    <section className="about-section bg-[#e0e0e0] text-black py-16 px-4 md:px-8">
+    <section className="about-section bg-[#e0e0e0] text-black py-16 px-4 md:px-8" id="about">
       <div className="max-w-6xl mx-auto flex flex-col">
         <h2 className="text-4xl font-bold mb-6 text-center landing-heading">About</h2>
         <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-full left-0"></div>

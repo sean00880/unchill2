@@ -73,9 +73,46 @@ const HomePage: React.FC = () => {
 
       {/* About Section */}
       <AboutSection images={images} />
+       {/* Whitepaper Section */}
+     
+       <section className="whitepaper-section py-16 p-4 relative text-black flex flex-col" id="whitepaper">
+  <h2 className="text-4xl landing-heading font-bold mb-4 text-yellow-500">Whitepaper</h2>
+  <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4"></div>
+  <div className="max-w-6xl mx-auto space-y-6 relative z-10 glassmorphism-effect p-4 rounded-sm">
+    <p className="text-lg">
+      The MemeLinked Whitepaper provides an in-depth look at our vision, goals, and strategies. As a project that bridges the gap between DeFi, GameFi, and social media, our aim is to redefine community-driven finance on the Ethereum blockchain. This whitepaper outlines how MemeLinked integrates with the Monkey Shit Inu ecosystem, offering users enhanced interactions, play-to-earn opportunities, and a seamless blend of financial tools with social connectivity.
+    </p>
+    <ul className="space-y-4">
+      <li>
+        <strong className="text-yellow-700">1. Vision and Mission:</strong> Creating a unified ecosystem where memes, social interaction, and DeFi converge to empower community engagement and investment.
+      </li>
+      <li>
+        <strong className="text-yellow-700">2. Core Features:</strong> Detailed insights into our DeFi Social Network, GameFi integrations, and the community-driven meme culture.
+      </li>
+      <li>
+        <strong className="text-yellow-700">3. Tokenomics:</strong> Comprehensive breakdown of the $MK token, including supply, transaction taxes, and allocations for sustainable growth.
+      </li>
+      <li>
+        <strong className="text-yellow-700">4. Roadmap:</strong> Strategic phases focusing on launch, marketing, platform expansion, and future developments.
+      </li>
+    </ul>
+    <p className="text-lg mt-4">
+      <Link href="/whitepaper" className="text-black font-bold hover:text-yellow-400">
+        Eexplore the Resources Section
+      </Link> to learn how MemeLinked is positioned to disrupt the DeFi landscape through innovation, community empowerment, and strategic growth.
+    </p>
+  </div>
+
+  {/* Animated Background */}
+  <div className="paper-scroll-background"></div>
+</section>
+
+
+
+
+
 {/* Tokenomics Section */}
-{/* Tokenomics Section */}
-<section className="tokenomics-section py-16 p-4 bg-[#e3af2c] text-white relative flex flex-col">
+<section className="tokenomics-section py-16 p-4 bg-[#e3af2c] text-white relative flex flex-col" id="tokenomics">
   <h2 className="text-4xl font-bold mb-4 text-white landing-heading">Tokenomics</h2>
   <div className="divider h-1 bg-[#090909] mb-8 mx-auto w-1/4"></div>
   <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 justify-center self-center items-center">
@@ -163,7 +200,7 @@ const HomePage: React.FC = () => {
 
 
       {/* Roadmap Section */}
-      <section className="roadmap-section py-16 p-2 bg-gradient-to-b from-[#e3af2c] via-black to-[#090909] text-white relativeflex flex-col">
+      <section className="roadmap-section py-16 p-2 bg-gradient-to-b from-[#e3af2c] via-black to-[#090909] text-white relativeflex flex-col" id="roadmap">
   <div className="max-w-3xl mx-auto flex flex-col">
     <h2 className="text-4xl font-bold mb-8 text-center neon-text landing-heading" data-text="Roadmap">Roadmap</h2>
     <div className="roadmap-container relative">
@@ -225,7 +262,7 @@ const HomePage: React.FC = () => {
 
       {/* Call-to-Action */}
 
-      <section className="blog-doc-section bg-[#090909] text-white py-16 px-8">
+      <section className="blog-doc-section bg-[#090909] text-white py-16 px-8" id="resources">
         <div className="max-w-6xl mx-auto items-center flex flex-col">
           <h2 className="landing-heading text-4xl font-bold mb-4 text-center" data-text="Resources">
             Resources
