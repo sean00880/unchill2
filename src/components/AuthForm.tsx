@@ -203,7 +203,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
 
         {/* Right Column: Dynamic Preview */}
         {(currentStep === 2 || currentStep === 3) && (
-          <div className="w-full md:w-1/2 h-auto md:h-[80vh] p-4 md:sticky md:top-[10vh] flex flex-col items-center justify-center">
+          <div className="w-full md:w-1/2 h-auto p-4 md:sticky md:top-[10vh] flex flex-col items-center justify-center">
             <div className={`${containerStyle} w-full`}>
               <h3 className="font-bold mb-4">Preview</h3>
               <div className="leading-relaxed text-gray-300">
