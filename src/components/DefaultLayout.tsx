@@ -18,7 +18,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="flex flex-col min-h-screen">
       <TopBar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-      <div className="flex flex-1]">
+      <div className="flex flex-1 justify-end">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} isDarkMode={isDarkMode} />
         <main className={`transition-all duration-100 ${isSidebarOpen ? 'md:ml-64 w-[calc(100%-16rem)]' : 'md:ml-16 w-[calc(100%-4rem)]'} bg-background text-foreground`}>
           {children}

@@ -145,7 +145,7 @@ const Post: React.FC<PostProps> = ({ username, avatar, timePosted, content, isDa
         </div>
         <div className="flex items-center flex-col">
             <div className="row">
-          <button onClick={handleThumbsUp} className={`mr-2 ${userReaction === 'up' ? 'text-green-500' : 'text-gray-500'}`}>
+          <button onClick={handleThumbsUp} className={`mr-2 ${userReaction === 'up' ? 'text-yellow-500' : 'text-gray-500'}`}>
             👍 {thumbsUpCount}
           </button>
           <button onClick={handleThumbsDown} className={`${userReaction === 'down' ? 'text-red-500' : 'text-gray-500'}`}>

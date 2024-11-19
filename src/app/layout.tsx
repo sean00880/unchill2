@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'urql';
 import { client } from '../lib/urql'; // Update the import path if necessary
 import localFont from 'next/font/local';
@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import DefaultLayout from "../components/DefaultLayout"; // Main default layout
 import DocumentationLayout from "../components/DocumentationLayout"; // Layout for blog and documentation
 import DocumentationLayout2 from "../components/DocumentationLayout2"; 
+import { AuthProvider, useAuthContext } from '../context/AuthContext'; // Import AuthProvider and useAuthContext
 
 // Define local fonts
 const geistSans = localFont({
@@ -31,28 +32,42 @@ const posts = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
+  const [user, setUser] = useState(null);
+  
   // Check if the current route is for the landing page, blog, or documentation
   const isLandingPage = pathname === '/';
   const isDocumentationPage = pathname.startsWith('/docs');
   const isBlogPage = pathname.startsWith('/blog');
 
+  // Fetch dynamic user data if not on the landing, blog, or documentation pages
+  useEffect(() => {
+    if (!isLandingPage && !isDocumentationPage && !isBlogPage) {
+      // Simulate fetching user data
+      setUser({
+        name: 'John Doe',
+        role: 'Developer',
+        preferences: { theme: 'dark' },
+      });
+    }
+  }, [pathname]);
+
   return (
-    <Provider value={client}>
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
-          {isLandingPage ? (
-            children
-          ) : isDocumentationPage ? (
-            <DocumentationLayout2 posts={posts}>{children}</DocumentationLayout2>
-          ) : isBlogPage ? (
-            <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
-          ) : (
-            <DefaultLayout>{children}</DefaultLayout>
-          )}
-        </body>
-        
-      </html>
-    </Provider>
+    <AuthProvider>
+      <Provider value={client}>
+        <html lang="en">
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+            {isLandingPage ? (
+              children
+            ) : isDocumentationPage ? (
+              <DocumentationLayout2 posts={posts}>{children}</DocumentationLayout2>
+            ) : isBlogPage ? (
+              <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
+            ) : (
+              <DefaultLayout user={user}>{children}</DefaultLayout>
+            )}
+          </body>
+        </html>
+      </Provider>
+    </AuthProvider>
   );
 }

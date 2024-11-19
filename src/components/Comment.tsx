@@ -58,7 +58,7 @@ const Comment: React.FC<CommentProps> = ({ username, avatar, timePosted, content
         </div>
       )}
       <div className="flex items-center mt-2">
-        <button onClick={handleLike} className={`mr-2 ${userReaction === 'like' ? 'text-green-500' : 'text-gray-500'}`}>
+        <button onClick={handleLike} className={`mr-2 ${userReaction === 'like' ? 'text-yellow-500' : 'text-gray-500'}`}>
           👍 {likeCount}
         </button>
         <button onClick={handleDislike} className={`${userReaction === 'dislike' ? 'text-red-500' : 'text-gray-500'}`}>

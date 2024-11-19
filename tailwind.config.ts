@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#00FF88", // Neon green
+        primary: "#00FF88", // Neon yellow
         background: "#111111", // Dark background
         secondary: "#00FF88", // Adjust as needed for holographic look
         card: "rgba(255, 255, 255, 0.1)", // Semi-transparent for glass effect

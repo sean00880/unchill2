@@ -42,7 +42,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
         <button
           onClick={handleConnect}
           className={`btn-connect px-4 py-2 rounded-md text-sm transition-all duration-300 ${
-            isConnected ? "bg-green-500" : "bg-blue-500"
+            isConnected ? "bg-yellow-500" : "bg-blue-500"
           } hover:bg-blue-600`}
         >
           {isConnected ? "Connected" : "Connect"}

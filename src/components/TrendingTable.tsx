@@ -26,7 +26,7 @@ export default function TrendingTable({ isDarkMode }: TrendingTableProps) {
 
   return (
     <section className={`trending-table glass ounded-xl ${isDarkMode ? 'bg-opacity-50' : 'bg-opacity-30'} backdrop-blur-md flex flex-col mt-4`}>
-      <h2 className={` mb-4 ${isDarkMode ? 'text-[green]' : 'text-[#fdd63a]'} text-center`}>Trending Influencers</h2>
+      <h2 className={` mb-4 ${isDarkMode ? 'text-[yellow]' : 'text-[#fdd63a]'} text-center`}>Trending Influencers</h2>
       <table className="w-full border-separate border-spacing-2">
         <thead>
           <tr className="text-center border-b border-gray-400">

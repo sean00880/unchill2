@@ -45,7 +45,7 @@ const Sidebar = ({
         onClick={toggleSidebar}
         aria-label="Toggle Sidebar Mobile"
         className={`absolute top-4 right-4 p-2 focus:outline-none rounded-md transition-all duration-300 md:hidden ${
-          isDarkMode ? "bg-[#090909] text-[#38c986]" : "bg-[#f5f5f5] text-[#333333]"
+          isDarkMode ? "bg-[#090909] text-[#ffe32b]" : "bg-[#f5f5f5] text-[#333333]"
         } transition-colors`}
       >
         {isOpen ? <FiX className="text-2xl transition-colors duration-500" /> : <FiMenu className="text-2xl transition-colors duration-300" />}
