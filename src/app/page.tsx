@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
      
        <section className="whitepaper-section py-16 p-4 relative text-black flex flex-col" id="whitepaper">
   <h2 className="text-4xl landing-heading font-bold mb-4 text-yellow-500">Whitepaper</h2>
-  <div className="divider h-1 bg-yellow-500 mb-8 mx-auto w-1/4"></div>
+  <div className="divider h-1 bg-black mb-8 mx-auto w-1/4"></div>
   <div className="max-w-6xl mx-auto space-y-6 relative z-10 glassmorphism-effect p-4 rounded-sm">
     <p className="text-lg">
       The MemeLinked Whitepaper provides an in-depth look at our vision, goals, and strategies. As a project that bridges the gap between DeFi, GameFi, and social media, our aim is to redefine community-driven finance on the Ethereum blockchain. This whitepaper outlines how MemeLinked integrates with the Monkey Shit Inu ecosystem, offering users enhanced interactions, play-to-earn opportunities, and a seamless blend of financial tools with social connectivity.
