@@ -1,13 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useAuthContext } from '../context/AuthContext'; // Import your context hook
 
 export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) {
-  const [isConnected, setIsConnected] = useState(false);
+  const { walletAddress, profileImage } = useAuthContext();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleConnect = () => {
-    setIsConnected(!isConnected);
+  const handleProfileHover = () => {
+    setIsMenuOpen(true);
+  };
+
+  const handleProfileLeave = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -26,7 +33,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
         />
       </div>
 
-      {/* Connect Button & Theme Toggle */}
+      {/* Connect Button & Profile Image */}
       <div className="w-1/3 flex justify-end items-center space-x-4">
         {/* Theme Toggle */}
         <button
@@ -38,15 +45,36 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
           {isDarkMode ? "☀️" : "🌙"}
         </button>
 
-        {/* Connect Button */}
-        <button
-          onClick={handleConnect}
-          className={`btn-connect px-4 py-2 rounded-md text-sm transition-all duration-300 ${
-            isConnected ? "bg-yellow-500" : "bg-blue-500"
-          } hover:bg-blue-600`}
-        >
-          {isConnected ? "Connected" : "Connect"}
-        </button>
+        {/* Profile Image or Connect Button */}
+        {walletAddress ? (
+          <div
+            className="relative"
+            onMouseEnter={handleProfileHover}
+            onMouseLeave={handleProfileLeave}
+          >
+            <Link href="/profile">
+              <Image
+                src={profileImage || "/images/default-profile.png"} // Fallback to default image
+                alt="Profile Image"
+                width={40}
+                height={40}
+                className="rounded-full cursor-pointer"
+              />
+            </Link>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-10">
+                <ul className="py-2">
+                  <li className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">Account Settings</li>
+                  <li className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">Logout</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        ) : (
+          // Use the <appkit-button> component for wallet and email connection
+          <w3m-button
+           />
+        )}
       </div>
     </div>
   );

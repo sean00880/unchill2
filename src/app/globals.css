@@ -66,7 +66,7 @@ ol li{
 }
 
 span, button{
-  font-size: .76rem;
+  font-size: 1rem;
   font-family: 'Exo2.0';
 }
 p, li{
@@ -487,14 +487,14 @@ background-color: none!important;
 }
 
 .gradient-button:hover {
-  box-shadow: 0px 0px 5px rgba(189, 244, 166, 0.771);
+  box-shadow: 0px 0px 5px #ffd400;
   transform: scale(1.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Hover effect */
 [data-theme="light"] .gradient-button:hover {
-  box-shadow: 0px 0px 15px rgba(176, 224, 157, 0.7);
+  box-shadow: 0px 0px 15px #ffd400;
 }
 
 [data-theme="dark"].gradient-button:hover {
@@ -577,6 +577,16 @@ img{
     transition: background-color 0.3s ease, color 0.3s ease;
  
 }
+
+.custom-upload-button {
+  display: inline-block;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  display: none;
+}
+
 
 
   .text{

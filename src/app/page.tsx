@@ -113,8 +113,8 @@ const HomePage: React.FC = () => {
 
 {/* Tokenomics Section */}
 <section className="tokenomics-section py-16 p-4 bg-[#e3af2c] text-white relative flex flex-col" id="tokenomics">
-  <h2 className="text-4xl font-bold mb-4 text-white landing-heading">Tokenomics</h2>
-  <div className="divider h-1 bg-[#090909] mb-8 mx-auto w-1/4"></div>
+  <h2 className="text-4xl font-bold mb-4 text-[#090909] landing-heading">Tokenomics</h2>
+  <div className="divider h-1 bg-[] mb-8 mx-auto w-1/4"></div>
   <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 justify-center self-center items-center">
     {/* Tokenomics Overview */}
     <div className="tokenomics-content space-y-6 flex flex-col order-2 lg:order-1">

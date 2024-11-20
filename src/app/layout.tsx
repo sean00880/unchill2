@@ -1,26 +1,33 @@
-"use client";
+'use client';
 import React from 'react';
 import { Provider } from 'urql';
-import { client } from '../lib/urql'; // Update the import path if necessary
+import { client } from '../lib/urql';
 import localFont from 'next/font/local';
-import "./globals.css";
+import './globals.css';
 import { usePathname } from 'next/navigation';
-import DefaultLayout from "../components/DefaultLayout"; // Main default layout
-import DocumentationLayout from "../components/DocumentationLayout"; // Layout for blog and documentation
-import DocumentationLayout2 from "../components/DocumentationLayout2"; 
+import DefaultLayout from '../components/DefaultLayout';
+import DocumentationLayout from '../components/DocumentationLayout';
+import DocumentationLayout2 from '../components/DocumentationLayout2';
+import { AuthProvider } from '../context/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
+import { config } from '../lib/config';
 
 // Define local fonts
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+  src: './fonts/GeistVF.woff',
+  variable: '--font-geist-sans',
+  weight: '100 900',
 });
 
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+  src: './fonts/GeistMonoVF.woff',
+  variable: '--font-geist-mono',
+  weight: '100 900',
 });
+
+// Create a new instance of QueryClient for TanStack Query
+const queryClient = new QueryClient();
 
 // Define the posts array for blog/documentation pages
 const posts = [
@@ -29,30 +36,38 @@ const posts = [
   { title: 'The Future of Meme-Driven Finance', href: '/blog/meme-finance-future' },
 ];
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+interface RootLayoutProps {
+  children: React.ReactNode;
+  cookies: string | null;
+}
 
-  // Check if the current route is for the landing page, blog, or documentation
+export default function RootLayout({ children, cookies }: RootLayoutProps) {
+  const pathname = usePathname();
   const isLandingPage = pathname === '/';
   const isDocumentationPage = pathname.startsWith('/docs');
   const isBlogPage = pathname.startsWith('/blog');
 
   return (
-    <Provider value={client}>
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
-          {isLandingPage ? (
-            children
-          ) : isDocumentationPage ? (
-            <DocumentationLayout2 posts={posts}>{children}</DocumentationLayout2>
-          ) : isBlogPage ? (
-            <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
-          ) : (
-            <DefaultLayout>{children}</DefaultLayout>
-          )}
-        </body>
-        
-      </html>
-    </Provider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <Provider value={client}>
+          <AuthProvider>
+            <html lang="en">
+              <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+                {isLandingPage ? (
+                  children
+                ) : isDocumentationPage ? (
+                  <DocumentationLayout2 posts={posts}>{children}</DocumentationLayout2>
+                ) : isBlogPage ? (
+                  <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
+                ) : (
+                  <DefaultLayout>{children}</DefaultLayout>
+                )}
+              </body>
+            </html>
+          </AuthProvider>
+        </Provider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

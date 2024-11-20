@@ -54,7 +54,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/declarations.d.ts", 
+    "src/**/*"
 , "src/services/pairData.js"  ],
   "exclude": [
     "node_modules"
