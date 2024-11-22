@@ -72,8 +72,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
           </div>
         ) : (
           // Use the <appkit-button> component for wallet and email connection
-          <w3m-button
-           />
+          <w3m-button/>
         )}
       </div>
     </div>

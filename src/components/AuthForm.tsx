@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ProgressBar from "./ProgressBar";
 import { supabase } from "../utils/supaBaseClient"; // Import Supabase client
 import AlertModal from "./AlertModal"; // Import the custom alert component
+import { useAuthContext } from "../context/AuthContext";
 
 interface ProfileData {
   display_name: string;
@@ -37,7 +38,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const totalSteps = 3;
-
+  const { walletAddress, accountIdentifier } = useAuthContext(); 
   const nextStep = () => {
     if (currentStep === 2 && (!displayName || !username)) {
       setAlertMessage("Display Name and Username are required.");
@@ -87,8 +88,8 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
   `;
 
   const handleSubmit = async () => {
-    if (!displayName || !username) {
-      setAlertMessage("Display Name and Username are required.");
+    if (!displayName || !username || !accountIdentifier) {
+      setAlertMessage("Display Name, Username, and Account Identifier are required.");
       return;
     }
 
@@ -103,27 +104,26 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
         membership_tier: membershipTier,
         profile_image_url: profilePicture,
         banner_image_url: bannerImage,
+        account_identifier: accountIdentifier, // Link the account identifier
       };
 
-      // Add different identifiers based on the selected signup option
+      // Add optional fields based on the signup option
       if (signupOption === "wallet") {
-        profileData.wallet_address = "user-wallet-address"; // Replace with actual wallet address when integrating
+        profileData.wallet_address = walletAddress ?? "";
       } else if (signupOption === "google") {
-        profileData.google_id = "user-google-id"; // Replace with actual Google ID when integrating
-      }
-
-      // Include optional email and password fields
-      if (signupOption === "email" || email || password) {
+        profileData.google_id = "user-google-id"; // Replace with actual Google ID logic
+      } else if (signupOption === "email" && email && password) {
         profileData.email = email;
-        profileData.password = password; // Ensure passwords are hashed before storing in production
+        profileData.password = password; // Ensure passwords are hashed in production
       }
 
       const { data, error } = await supabase.from("profiles").insert([profileData]);
+
       if (error) {
         console.error("Error inserting profile:", error.message);
         setAlertMessage("Error: " + error.message);
       } else {
-        console.log("Profile inserted successfully:", data);
+        console.log("Profile created successfully:", data);
         setAlertMessage("Profile created successfully!");
       }
     } catch (error) {
@@ -157,39 +157,13 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
 
             {currentStep === 1 && (
               <motion.div className="flex flex-col w-[50%] self-center items-center justify-center">
-                <motion.button
-                  onClick={() => {
-                    setSignupOption("wallet");
-                    nextStep();
-                  }}
-                  className="gradient-button w-full items-center flex flex-col mb-4"
-                >
-                  <Image src="/images/wallet.png" alt="Wallet" width={30} height={30} className="mr-3" />
-                  <span className="font-semibold">Connect with Wallet</span>
-                </motion.button>
-                <div className="text-center my-4">or</div>
-                <motion.button
-                  onClick={() => {
-                    setSignupOption("google");
-                    nextStep();
-                  }}
-                  className="gradient-button w-full items-center flex flex-col mb-4"
-                >
-                  <Image src="/images/google-icon.svg" alt="Google" width={30} height={30} className="mr-3" />
-                  <span className="font-semibold">Continue with Google</span>
-                </motion.button>
-                <div className="text-center my-4">or</div>
-                <motion.button
-                  onClick={() => {
-                    setSignupOption("email");
-                    nextStep();
-                  }}
-                  className="gradient-button w-full items-center flex flex-col mb-4"
-                >
-                  <span className="font-semibold">Sign up with Email</span>
-                </motion.button>
+               
+                  <w3m-button />
+             
               </motion.div>
             )}
+
+
 
             {currentStep === 2 && (
               <form>
