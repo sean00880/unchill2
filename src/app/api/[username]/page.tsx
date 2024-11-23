@@ -1,14 +1,13 @@
 import { getProfileImageUrl } from "../../../utils/imageUtils";
 import Image from "next/image";
 
-// Define the structure of dynamic route props
-interface UserProfileProps {
-  params: { username: string };
-}
-
-// Correctly export the component with dynamic route handling
-const UserProfile = async ({ params }: UserProfileProps) => {
-  const { username } = params;
+// Define the async function to handle dynamic params
+export default async function UserProfile({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params; // Await the promise to extract `username`
 
   return (
     <div className="profile-container">
@@ -31,6 +30,4 @@ const UserProfile = async ({ params }: UserProfileProps) => {
       </div>
     </div>
   );
-};
-
-export default UserProfile;
+}
