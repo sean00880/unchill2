@@ -1,11 +1,9 @@
 import { getProfileImageUrl } from "../../../utils/imageUtils";
 import Image from "next/image";
 
-interface UserProfileProps {
-  params: { username: string };
-}
 
-export default function UserProfile({ params }: UserProfileProps) {
+
+export default function UserProfile({ params }: { params: { username: string } }) {
   const { username } = params;
 
   return (
