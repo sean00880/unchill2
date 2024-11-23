@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "../../../../utils/supaBaseClient";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { username: string; imageType: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { username: string; imageType: string } }) {
   try {
+    console.log("Request received:", req.url);
+
+    // Access the route parameters
     const { username, imageType } = params;
 
     if (!username || !imageType) {
