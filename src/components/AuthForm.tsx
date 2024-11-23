@@ -383,7 +383,9 @@ return (
         )}
       </div>
     </div>
-    <Footer className="z-10" />
+    <div className="z-10 w-full">
+    <Footer  />
+    </div>
   </>
 );
 }
