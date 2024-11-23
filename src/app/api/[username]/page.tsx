@@ -1,13 +1,13 @@
 import { getProfileImageUrl } from "../../../utils/imageUtils";
 import Image from "next/image";
 
-// Define the structure of the props
+// Define the structure of dynamic route props
 interface UserProfileProps {
   params: { username: string };
 }
 
-// Correctly handle `params` to align with Next.js dynamic routes
-export default function UserProfile({ params }: UserProfileProps) {
+// Correctly export the component with dynamic route handling
+const UserProfile = async ({ params }: UserProfileProps) => {
   const { username } = params;
 
   return (
@@ -31,4 +31,6 @@ export default function UserProfile({ params }: UserProfileProps) {
       </div>
     </div>
   );
-}
+};
+
+export default UserProfile;
