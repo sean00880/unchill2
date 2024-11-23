@@ -3,15 +3,17 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import ProgressBar from "./ProgressBar";
-import { supabase } from "../utils/supaBaseClient"; // Import Supabase client
-import AlertModal from "./AlertModal"; // Import the custom alert component
+import { supabase } from "../utils/supaBaseClient";
+import AlertModal from "./AlertModal";
 import { useAuthContext } from "../context/AuthContext";
+import Footer from "./Footer";
 
 interface ProfileData {
   display_name: string;
   username: string;
   about: string;
   role: string;
+  account_identifier: string;
   profile_type: string;
   membership_tier: string;
   profile_image_url: string | null;
@@ -20,6 +22,7 @@ interface ProfileData {
   password?: string;
   google_id?: string;
   wallet_address?: string;
+  short_id?: string;
 }
 
 export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
@@ -33,12 +36,13 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [about, setAbout] = useState("");
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [bannerImage, setBannerImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const totalSteps = 3;
-  const { walletAddress, accountIdentifier } = useAuthContext(); 
+  const { walletAddress, accountIdentifier } = useAuthContext();
+
   const nextStep = () => {
     if (currentStep === 2 && (!displayName || !username)) {
       setAlertMessage("Display Name and Username are required.");
@@ -53,20 +57,6 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
     setAlertMessage(null);
   };
 
-  const handleImageUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setImage: React.Dispatch<React.SetStateAction<string | null>>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleChange = useCallback(
     (setter: React.Dispatch<React.SetStateAction<string>>) => (
       e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -75,6 +65,86 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
     },
     []
   );
+
+  const handleImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setImage: React.Dispatch<React.SetStateAction<File | null>>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  const uploadImageToBucket = async (
+    file: File | null,
+    folder: string,
+    filePrefix: string
+  ): Promise<string | null> => {
+    if (!file) return null;
+
+    const fileType = file.type.split("/")[1]; // Extract file extension (e.g., png, jpeg)
+    const filename = `${filePrefix}.${fileType}`;
+
+    const { error } = await supabase.storage
+      .from("profile-images")
+      .upload(`${folder}/${filename}`, file, {
+        cacheControl: "3600",
+        upsert: true,
+        contentType: file.type,
+      });
+
+    if (error) {
+      console.error("Error uploading image:", error.message);
+      throw new Error("Failed to upload image.");
+    }
+
+    return `/api/${folder}/${filePrefix}.${fileType}`; // Internal API path
+  };
+
+  const handleSubmit = async () => {
+    if (!displayName || !username || !accountIdentifier) {
+      setAlertMessage("Display Name, Username, and Account Identifier are required.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const profileFolder = username; // Use username as folder name
+
+      // Upload images and generate URLs
+      const profileImageUrl = await uploadImageToBucket(profilePicture, profileFolder, "profile");
+      const bannerImageUrl = await uploadImageToBucket(bannerImage, profileFolder, "banner");
+
+      // Insert profile data in a single operation
+      const { error } = await supabase
+        .from("profiles")
+        .insert({
+          display_name: displayName,
+          username: username,
+          about: about,
+          role: role,
+          profile_type: profile,
+          membership_tier: membershipTier,
+          account_identifier: accountIdentifier,
+          profile_image_url: profileImageUrl,
+          banner_image_url: bannerImageUrl,
+        });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setAlertMessage("Profile created successfully!");
+    } catch (error: unknown) {
+      console.error("Error during profile creation:", error);
+      setAlertMessage(`An error occurred: ${(error as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const containerStyle = `
     ${isDarkMode ? "" : "bg-white/80"} 
@@ -87,57 +157,12 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
     cursor-pointer transform hover:scale-105 text
   `;
 
-  const handleSubmit = async () => {
-    if (!displayName || !username || !accountIdentifier) {
-      setAlertMessage("Display Name, Username, and Account Identifier are required.");
-      return;
-    }
 
-    setLoading(true);
-    try {
-      const profileData: ProfileData = {
-        display_name: displayName,
-        username: username,
-        about: about,
-        role: role,
-        profile_type: profile,
-        membership_tier: membershipTier,
-        profile_image_url: profilePicture,
-        banner_image_url: bannerImage,
-        account_identifier: accountIdentifier, // Link the account identifier
-      };
-
-      // Add optional fields based on the signup option
-      if (signupOption === "wallet") {
-        profileData.wallet_address = walletAddress ?? "";
-      } else if (signupOption === "google") {
-        profileData.google_id = "user-google-id"; // Replace with actual Google ID logic
-      } else if (signupOption === "email" && email && password) {
-        profileData.email = email;
-        profileData.password = password; // Ensure passwords are hashed in production
-      }
-
-      const { data, error } = await supabase.from("profiles").insert([profileData]);
-
-      if (error) {
-        console.error("Error inserting profile:", error.message);
-        setAlertMessage("Error: " + error.message);
-      } else {
-        console.log("Profile created successfully:", data);
-        setAlertMessage("Profile created successfully!");
-      }
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      setAlertMessage("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="flex flex-col w-full min-h-screen">
+return (
+  <>
+    <div className="flex flex-col w-full min-h-screen mt-20">
       {alertMessage && <AlertModal message={alertMessage} onClose={handleCloseAlert} />}
-      <div className="w-full sticky top-0 z-10 bg-transparent">
+      <div className="progress-bar-container flex self-center items-center">
         <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
       </div>
 
@@ -157,19 +182,15 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
 
             {currentStep === 1 && (
               <motion.div className="flex flex-col w-[50%] self-center items-center justify-center">
-               
-                  <w3m-button />
-             
+                <w3m-button />
               </motion.div>
             )}
-
-
 
             {currentStep === 2 && (
               <form>
                 <h6 className="absolute top-2 right-2 text-sm">
                   <span className="text-[red]"> * </span>
-                  <span className="text-sm text italic">= Required Fields</span>
+                  <span className="text-sm italic">= Required Fields</span>
                 </h6>
                 <span>Create Your Profile:</span>
                 <div className="mt-2 space-y-4">
@@ -251,7 +272,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
                     />
                     Basic
                   </label>
-                  <label className="flex text items-center">
+                  <label className="flex items-center text">
                     <input
                       type="radio"
                       name="membershipTier"
@@ -276,7 +297,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
                     </option>
                   ))}
                 </select>
-                <label className="text block mt-4">Role</label>
+                <label className="block mt-4 text">Role</label>
                 <select
                   className="w-full p-2 border rounded-md bg-transparent"
                   value={role}
@@ -304,12 +325,12 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
 
         {/* Right Column: Dynamic Preview */}
         {(currentStep === 2 || currentStep === 3) && (
-          <div className="w-full md:w-1/2 p-4 md:sticky self-center flex flex-col items-center">
-            <div className={`${containerStyle} w-full`}>
+          <div className="w-full md:w-1/2 md:h-[calc(100vh-4rem)] bottom-0 p-4 md:sticky ">
+            <div className={`${containerStyle} w-full top-[20%] sticky`}>
               <div className="relative w-full mb-4 h-32 bg-gray-700 rounded-md flex justify-center items-center">
                 {bannerImage ? (
                   <Image
-                    src={bannerImage}
+                    src={URL.createObjectURL(bannerImage)}
                     alt="Banner Preview"
                     layout="fill"
                     objectFit="cover"
@@ -331,7 +352,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
               <div className="relative w-24 h-24 mt-4 mb-2 rounded-full overflow-hidden border border-gray-300">
                 {profilePicture ? (
                   <Image
-                    src={profilePicture}
+                    src={URL.createObjectURL(profilePicture)}
                     alt="Profile Preview"
                     layout="fill"
                     objectFit="cover"
@@ -377,11 +398,11 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="mt-4 md:fixed md:bottom-4 md:right-4 flex justify-center md:justify-end space-x-4">
+      <div className="mt-4 md:fixed z-50 md:bottom-4 md:right-4 flex justify-center md:justify-end space-x-4">
         {currentStep > 1 && (
           <button
             onClick={prevStep}
-            className="p-2 text border rounded-md hover:bg-gray-100 hover:text-yellow-700 transition"
+            className="p-2 text border rounded-md bg-black hover:bg-gray-100 hover:text-[#af9f45] transition"
           >
             Back
           </button>
@@ -393,5 +414,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
         )}
       </div>
     </div>
-  );
+    <Footer className="z-10" />
+  </>
+);
 }

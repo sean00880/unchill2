@@ -54,7 +54,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
           >
             <Link href="/profile">
               <Image
-                src={profileImage || "/images/default-profile.png"} // Fallback to default image
+                src={profileImage || "/images/default_logo.jpg"} // Fallback to default image
                 alt="Profile Image"
                 width={40}
                 height={40}

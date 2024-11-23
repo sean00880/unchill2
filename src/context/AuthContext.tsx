@@ -1,14 +1,15 @@
 "use client";
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
 import { Connector, useConnect, useDisconnect } from "wagmi";
-import { wagmiAdapter, projectId } from "../lib/config"; // Import wagmiAdapter and projectId
+import { wagmiAdapter, projectId } from "../lib/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { createAppKit } from "@reown/appkit";
 import { mainnet, base, bsc } from "@reown/appkit/networks";
-import { useAppKitAccount } from "@reown/appkit/react"; // Import useAppKitAccount for account details
+import { useAppKitAccount } from "@reown/appkit/react";
 
-// Initialize AppKit with the wagmiAdapter and project ID
+// Initialize AppKit
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
@@ -21,7 +22,7 @@ export const appKit = createAppKit({
   },
 });
 
-// Create a new instance of QueryClient for TanStack Query
+// Create a QueryClient instance
 const queryClient = new QueryClient();
 
 interface AuthContextType {
@@ -32,7 +33,7 @@ interface AuthContextType {
   profileImage: string | null;
   setProfileImage: (image: string | null) => void;
   walletAddress: string | null;
-  accountIdentifier: string | null; // Include the account identifier in the context
+  accountIdentifier: string | null;
   isVerified: boolean;
   setIsVerified: (verified: boolean) => void;
   logout: () => void;
@@ -44,67 +45,124 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
   children: ReactNode;
-  cookies?: string | null; // Optional cookies prop
+  cookies?: string | null;
 };
 
 export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const { disconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
-  const { address, isConnected, caipAddress } = useAppKitAccount(); // Fetch account details
+  const { address, isConnected, caipAddress } = useAppKitAccount();
 
-  const [displayName, setDisplayName] = useState<string>(() => (typeof window !== "undefined" ? localStorage.getItem("displayName") || "" : ""));
-  const [username, setUsername] = useState<string>(() => (typeof window !== "undefined" ? localStorage.getItem("username") || "" : ""));
-  const [profileImage, setProfileImage] = useState<string | null>(() => (typeof window !== "undefined" ? localStorage.getItem("profileImage") || null : null));
-  const [isVerified, setIsVerified] = useState<boolean>(() => (typeof window !== "undefined" ? localStorage.getItem("isVerified") === "true" : false));
-  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(null); // State for account identifier
+  const [displayName, setDisplayName] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return localStorage.getItem("displayName") || "";
+    } catch (error) {
+      console.error("Failed to load displayName from localStorage:", error);
+      return "";
+    }
+  });
 
-  // Effect to handle account identifier synchronization
+  const [username, setUsername] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return localStorage.getItem("username") || "";
+    } catch (error) {
+      console.error("Failed to load username from localStorage:", error);
+      return "";
+    }
+  });
+
+  const [profileImage, setProfileImage] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      return localStorage.getItem("profileImage") || null;
+    } catch (error) {
+      console.error("Failed to load profileImage from localStorage:", error);
+      return null;
+    }
+  });
+
+  const [isVerified, setIsVerified] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem("isVerified") === "true";
+    } catch (error) {
+      console.error("Failed to load isVerified from localStorage:", error);
+      return false;
+    }
+  });
+
+  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      return localStorage.getItem("accountIdentifier") || null;
+    } catch (error) {
+      console.error("Failed to load accountIdentifier from localStorage:", error);
+      return null;
+    }
+  });
+
   useEffect(() => {
     if (isConnected && caipAddress) {
       setAccountIdentifier(caipAddress);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("accountIdentifier", caipAddress); // Store the identifier in localStorage
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("accountIdentifier", caipAddress);
+        }
+      } catch (error) {
+        console.error("Failed to save accountIdentifier to localStorage:", error);
       }
-      console.log("Account Identifier updated:", caipAddress); // Log the account identifier
     }
   }, [isConnected, caipAddress]);
 
-  // Effect to handle cookies
   useEffect(() => {
     if (cookies) {
-      console.log("Cookies:", cookies);
+      console.log("Cookies received:", cookies);
     }
   }, [cookies]);
 
-  // Synchronize displayName with localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("displayName", displayName);
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("displayName", displayName);
+      }
+    } catch (error) {
+      console.error("Failed to save displayName to localStorage:", error);
     }
   }, [displayName]);
 
-  // Synchronize username with localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("username", username);
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("username", username);
+      }
+    } catch (error) {
+      console.error("Failed to save username to localStorage:", error);
     }
   }, [username]);
 
-  // Synchronize profileImage with localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (profileImage) {
-        localStorage.setItem("profileImage", profileImage);
-      } else {
-        localStorage.removeItem("profileImage");
+    try {
+      if (typeof window !== "undefined") {
+        if (profileImage) {
+          localStorage.setItem("profileImage", profileImage);
+        } else {
+          localStorage.removeItem("profileImage");
+        }
       }
+    } catch (error) {
+      console.error("Failed to save or remove profileImage in localStorage:", error);
     }
   }, [profileImage]);
 
-  // Synchronize isVerified with localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("isVerified", isVerified.toString());
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("isVerified", isVerified.toString());
+      }
+    } catch (error) {
+      console.error("Failed to save isVerified to localStorage:", error);
     }
   }, [isVerified]);
 
@@ -113,11 +171,17 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
     setUsername("");
     setProfileImage(null);
     setIsVerified(false);
-    setAccountIdentifier(null); // Clear the account identifier on logout
-    disconnect();
-    if (typeof window !== "undefined") {
-      localStorage.clear();
+    setAccountIdentifier(null);
+
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+      }
+    } catch (error) {
+      console.error("Failed to clear localStorage during logout:", error);
     }
+
+    disconnect();
   };
 
   const handleConnect = async (connector: Connector): Promise<void> => {
@@ -141,9 +205,9 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
             profileImage,
             setProfileImage,
             walletAddress: address ?? null,
-            accountIdentifier, // Provide the account identifier to the context
+            accountIdentifier,
             isVerified,
-            setIsVerified,https://t.me/DaffyCoinSolana
+            setIsVerified,
             logout,
             connect: handleConnect,
             connectors,

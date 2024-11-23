@@ -1022,3 +1022,14 @@ Img{
     transform: translateX(-50%);
   }
 }
+
+
+.progress-bar-container {
+  position: sticky;
+  justify-self: center;
+  align-items: center;
+  width: 70%;
+  top: 6rem; /* Adjust based on your navbar height */
+  z-index: 10; /* Ensure it stays above other elements */
+  background-color: transparent; /* Match the background */
+}
