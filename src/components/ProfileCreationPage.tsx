@@ -33,7 +33,7 @@ export default function ProfileCreationPage() {
           .upload(`public/${username}-profile`, profilePicture);
 
         if (error) throw error;
-        profilePicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pictures/${data.path}`;
+        profilePicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/profile-pictures/${data.path}`;
       }
 
       const { error } = await supabase

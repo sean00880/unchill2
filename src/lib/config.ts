@@ -4,7 +4,7 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { mainnet, base, bsc } from '@reown/appkit/networks';
 
 // Retrieve the project ID from the environment variables
-export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '<your-project-id>';
+export const projectId = process.env.PROJECT_ID || '<your-project-id>';
 
 if (!projectId) {
   throw new Error('Project ID is not defined');
