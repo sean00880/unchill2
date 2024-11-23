@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "../../../../utils/supaBaseClient";
 
-export async function GET(req: NextRequest, { params }: { params: { username: string; imageType: string } }) {
+export async function GET(req: NextRequest) {
   try {
     console.log("Request received:", req.url);
 
-    // Access the route parameters
-    const { username, imageType } = params;
+    // Extract route parameters from the URL
+    const username = req.nextUrl.pathname.split("/")[3];
+    const imageType = req.nextUrl.pathname.split("/")[4];
+
+    console.log("Extracted params:", { username, imageType });
 
     if (!username || !imageType) {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
