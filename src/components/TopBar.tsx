@@ -31,7 +31,7 @@ export default function TopBar({
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Compute profile image
-  const profileImage = activeProfile?.profileImage || "/images/default_logo.jpg";
+  const profileImage = activeProfile?.profileImageUrl || "/images/default_logo.jpg";
 
   const handleProfileHover = () => setIsMenuOpen(true);
   const handleProfileLeave = () => setIsMenuOpen(false);

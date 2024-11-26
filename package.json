@@ -39,6 +39,7 @@
     "graphql": "^16.9.0",
     "iconoir-react": "^7.9.0",
     "jsbi": "^4.3.0",
+    "nanoid": "^5.0.9",
     "next": "15.0.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

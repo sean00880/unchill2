@@ -7,6 +7,7 @@ import AlertModal from "../../../components/AlertModal";
 import { supabase } from "../../../utils/supaBaseClient";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import { generateShortId } from '../../../utils/idGenerator';
 
 export default function CreateProfilePage() {
   const { walletAddress, accountIdentifier } = useAuthContext();
