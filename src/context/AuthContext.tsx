@@ -25,23 +25,23 @@ export const appKit = createAppKit({
 // Create a QueryClient instance
 const queryClient = new QueryClient();
 
-interface AuthContextType {
+interface Profile {
   displayName: string;
-  setDisplayName: (name: string) => void;
   username: string;
-  setUsername: (name: string) => void;
-  about: string;
-  setAbout: (about: string) => void;
   profileImage: string | null;
-  setProfileImage: (image: string | null) => void;
-  bannerImage: string | null;
-  setBannerImage: (image: string | null) => void;
+}
+
+interface AuthContextType {
   walletAddress: string | null;
   accountIdentifier: string | null;
-  isVerified: boolean;
-  setIsVerified: (verified: boolean) => void;
-  logout: () => void;
+  profiles: Record<string, Profile>; // Profiles by wallet
+  walletProfiles: Record<string, Profile>; // Alias for better integration
+  activeWallet: string | null;
+  profileImage: string | null; // Profile image of the active wallet
+  activeProfile: Profile | null;
+  setActiveWallet: (walletAddress: string) => void;
   connect: (connector: Connector) => Promise<void>;
+  disconnect: () => Promise<void>;
   connectors: readonly Connector[];
 }
 
@@ -53,119 +53,86 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
-  const { disconnect } = useDisconnect();
+  const { disconnect: wagmiDisconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress } = useAppKitAccount();
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  // States for user profile
-  const [displayName, setDisplayName] = useState<string>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("displayName") || "" : ""
-  );
-  const [username, setUsername] = useState<string>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("username") || "" : ""
-  );
-  const [about, setAbout] = useState<string>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("about") || "" : ""
-  );
-  const [profileImage, setProfileImage] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("profileImage") || null : null
-  );
-  const [bannerImage, setBannerImage] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("bannerImage") || null : null
-  );
-  const [isVerified, setIsVerified] = useState<boolean>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("isVerified") === "true" : false
-  );
-  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("accountIdentifier") || null : null
-  );
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(null);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [activeWallet, setActiveWallet] = useState<string | null>(null);
+  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  // Ensure alertMessage is used properly in the component
+  // Alias for compatibility
+  const walletProfiles = profiles;
+
+  // Automatically synchronize wallet connection
   useEffect(() => {
-    if (alertMessage) {
-      alert(alertMessage); // Use alert or a modal
-      setAlertMessage(null); // Reset after showing the message
+    if (isConnected && address) {
+      setWalletAddress(address);
     }
-  }, [alertMessage]);
+  }, [isConnected, address]);
 
-  // Sync accountIdentifier with wallet connection
+  // Set accountIdentifier and update active wallet/profile when connected
   useEffect(() => {
     if (isConnected && caipAddress) {
       setAccountIdentifier(caipAddress);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("accountIdentifier", caipAddress);
+
+      // Load or initialize profiles from localStorage or API
+      const storedProfiles = JSON.parse(localStorage.getItem("profiles") || "{}");
+      setProfiles(storedProfiles);
+
+      // Set the active profile and image based on the active wallet
+      if (address && storedProfiles[address]) {
+        setActiveWallet(address);
+        setActiveProfile(storedProfiles[address]);
+        setProfileImage(storedProfiles[address].profileImage);
       }
     }
-  }, [isConnected, caipAddress]);
+  }, [isConnected, caipAddress, address]);
 
-  // Sync states with localStorage
+  // Save profiles to localStorage whenever updated
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("displayName", displayName);
-      localStorage.setItem("username", username);
-      localStorage.setItem("about", about);
-
-      if (profileImage) {
-        localStorage.setItem("profileImage", profileImage);
-      } else {
-        localStorage.removeItem("profileImage");
-      }
-
-      if (bannerImage) {
-        localStorage.setItem("bannerImage", bannerImage);
-      } else {
-        localStorage.removeItem("bannerImage");
-      }
-
-      localStorage.setItem("isVerified", isVerified.toString());
+      localStorage.setItem("profiles", JSON.stringify(profiles));
     }
-  }, [displayName, username, about, profileImage, bannerImage, isVerified]);
+  }, [profiles]);
 
-  // Load profile data if connected
-  useEffect(() => {
-    if (isConnected && accountIdentifier) {
-      setDisplayName(localStorage.getItem("displayName") || "");
-      setUsername(localStorage.getItem("username") || "");
-    }
-  }, [isConnected, accountIdentifier]);
-
-  // Handle cookies for debugging
-  useEffect(() => {
-    if (cookies) {
-      console.log("Cookies received:", cookies);
-    }
-  }, [cookies]);
-
-  // Logout functionality
-  const logout = async () => {
-    setDisplayName("");
-    setUsername("");
-    setAbout("");
-    setProfileImage(null);
-    setBannerImage(null);
-    setIsVerified(false);
-    setAccountIdentifier(null);
-
-    if (typeof window !== "undefined") {
-      localStorage.clear();
-    }
-
-    // Disconnect wallet via AppKit
+  // Wallet connect logic
+  const handleConnect = async (connector: Connector): Promise<void> => {
     try {
+      await connect({ connector });
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      alert("Wallet connection failed. Please try again.");
+    }
+  };
+
+  // Wallet disconnect logic
+  const handleDisconnect = async (): Promise<void> => {
+    setWalletAddress(null);
+    setAccountIdentifier(null);
+    setActiveWallet(null);
+    setActiveProfile(null);
+    setProfileImage(null);
+    try {
+      await wagmiDisconnect();
       await appKit.adapter?.connectionControllerClient?.disconnect();
     } catch (error) {
       console.error("Wallet disconnect error:", error);
     }
   };
 
-  // Connection logic
-  const handleConnect = async (connector: Connector): Promise<void> => {
-    try {
-      await connect({ connector });
-    } catch (error) {
-      console.error("Connection failed:", error);
-      setAlertMessage("Wallet connection failed. Please try again.");
+  // Set the active wallet and its corresponding profile
+  const handleSetActiveWallet = (wallet: string) => {
+    setActiveWallet(wallet);
+    if (profiles[wallet]) {
+      setActiveProfile(profiles[wallet]);
+      setProfileImage(profiles[wallet].profileImage);
+    } else {
+      setActiveProfile(null);
+      setProfileImage(null);
     }
   };
 
@@ -174,22 +141,16 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       <QueryClientProvider client={queryClient}>
         <AuthContext.Provider
           value={{
-            displayName,
-            setDisplayName,
-            username,
-            setUsername,
-            about,
-            setAbout,
-            profileImage,
-            setProfileImage,
-            bannerImage,
-            setBannerImage,
-            walletAddress: address ?? null,
+            walletAddress,
             accountIdentifier,
-            isVerified,
-            setIsVerified,
-            logout,
+            profiles,
+            walletProfiles,
+            activeWallet,
+            profileImage,
+            activeProfile,
+            setActiveWallet: handleSetActiveWallet,
             connect: handleConnect,
+            disconnect: handleDisconnect,
             connectors,
           }}
         >

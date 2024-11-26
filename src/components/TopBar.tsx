@@ -1,38 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuthContext } from "../context/AuthContext"; // Import your context hook
+import { Connector } from "wagmi";
 
 export default function TopBar({
   isDarkMode,
   toggleTheme,
+  walletAddress,
+  profileImage,
+  connect,
+  disconnect,
+  connectors,
 }: {
   isDarkMode: boolean;
   toggleTheme: () => void;
+  walletAddress: string | null;
+  profileImage: string | null;
+  connect: (connector: Connector) => Promise<void>;
+  disconnect: () => Promise<void>;
+  connectors: readonly Connector[]; // Use the Connector type from `wagmi`
 }) {
-  const { walletAddress, profileImage, connect, logout, connectors } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-
-  // Handle wallet reconnection
-  useEffect(() => {
-    const reconnectWallet = async () => {
-      if (!walletAddress && connectors.length > 0 && !isConnecting) {
-        try {
-          setIsConnecting(true); // Prevent multiple connection attempts
-          await connect(connectors[0]);
-        } catch (error) {
-          console.error("Wallet reconnection failed:", error);
-        } finally {
-          setIsConnecting(false); // Reset after the connection attempt
-        }
-      }
-    };
-
-    reconnectWallet();
-  }, [walletAddress, connectors, connect, isConnecting]);
 
   const handleProfileHover = () => {
     setIsMenuOpen(true);
@@ -40,6 +31,19 @@ export default function TopBar({
 
   const handleProfileLeave = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleConnect = async () => {
+    if (connectors.length > 0 && !isConnecting) {
+      try {
+        setIsConnecting(true);
+        await connect(connectors[0]); // Attempt to connect using the first connector
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+      } finally {
+        setIsConnecting(false);
+      }
+    }
   };
 
   return (
@@ -50,7 +54,7 @@ export default function TopBar({
       {/* Centered Logo Container */}
       <div className="flex-1 flex justify-center items-center">
         <Image
-          src={isDarkMode ? "/images/LOGODARK.png" : "/images/LogoLIGHT.png"} // Conditional logo path
+          src={isDarkMode ? "/images/LOGODARK.png" : "/images/LogoLIGHT.png"}
           alt="Logo"
           width={240}
           height={40}
@@ -79,7 +83,7 @@ export default function TopBar({
           >
             <Link href="/profile">
               <Image
-                src={profileImage || "/images/default_logo.jpg"} // Fallback to default image
+                src={profileImage || "/images/default_logo.jpg"}
                 alt="Profile Image"
                 width={40}
                 height={40}
@@ -94,7 +98,7 @@ export default function TopBar({
                   </li>
                   <li
                     className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                    onClick={logout}
+                    onClick={disconnect}
                   >
                     Logout
                   </li>
@@ -103,8 +107,12 @@ export default function TopBar({
             )}
           </div>
         ) : (
-          // Use the <w3m-button> component for wallet and email connection
-          <w3m-button />
+          <button
+            onClick={handleConnect}
+            className="p-2 rounded-md border border-gray-600 bg-blue-500 text-white hover:bg-blue-600 transition"
+          >
+            Connect Wallet
+          </button>
         )}
       </div>
     </div>

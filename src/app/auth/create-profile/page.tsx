@@ -150,14 +150,18 @@ export default function CreateProfilePage() {
               {alertMessage && !showRedirect && (
         <AlertModal message={alertMessage} onClose={() => setAlertMessage(null)} />
       )}
-      {showRedirect && (
-        <AlertModal
-          message="Profile creation successful! Redirecting to overview..."
-          onClose={() => {
-            router.push("/auth/overview");
-          }}
-        />
-      )}
+     {showRedirect && (
+  <AlertModal
+    message="Profile creation successful! Redirecting to overview..."
+    onClose={() => {
+      setShowRedirect(false); // Close the modal
+      setTimeout(() => {
+        router.push("/auth/overview"); // Redirect after modal closes
+      }, 300); // Adjust delay as necessary
+    }}
+  />
+)}
+
       
       <div className="w-full md:w-1/2 overflow-auto p-4 mt-40">
         <ProfileForm profileData={profileData} handleChange={handleChange} errors={errors} />
