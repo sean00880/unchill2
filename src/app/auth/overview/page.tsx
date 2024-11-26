@@ -1,114 +1,126 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "../../../utils/supaBaseClient";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "../../../context/AuthContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface ProfileData {
-  display_name: string;
-  username: string;
-  about: string;
-  profile_image_url: string | null;
-  banner_image_url: string | null;
-  membership_tier: string;
-  role: string;
-  profile_type: string;
-}
-
 export default function ProfileOverviewPage() {
-  const { accountIdentifier, logout } = useAuthContext();
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    activeProfile,
+    activeWallet,
+    disconnect,
+    profiles,
+    setActiveWallet,
+  } = useAuthContext();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
+  // Redirect if no wallet is connected or no active profile is set
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!accountIdentifier) {
-        router.push("/auth/connect");
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("account_identifier", accountIdentifier)
-        .single();
-
-      if (error || !data) {
-        router.push("/auth/create-profile");
-        return;
-      }
-
-      setProfileData(data);
-      setLoading(false);
-    };
-
-    fetchProfile();
-  }, [accountIdentifier, router]);
+    if (!activeWallet) {
+      router.push("/auth/connect");
+    } else if (!activeProfile) {
+      router.push("/auth/create-profile");
+    }
+  }, [activeWallet, activeProfile, router]);
 
   const handleLogout = async () => {
-    await logout();
+    setLoading(true);
+    await disconnect();
+    setLoading(false);
     router.push("/auth/connect");
   };
 
-  if (loading) {
+  const handleSwitchProfile = (walletAddress: string) => {
+    setActiveWallet(walletAddress);
+    window.location.reload(); // Reload to reflect the profile change
+  };
+
+  if (!activeProfile || !activeWallet) {
     return <div className="text-center text-white">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-dark text-white flex flex-col items-center justify-center p-6">
-      {profileData && (
-        <div className="w-full md:w-2/3 bg-gray-800 p-6 rounded-lg shadow-lg">
-          <div className="text-center">
-            {profileData.banner_image_url ? (
-              <Image
-                src={profileData.banner_image_url}
-                alt="Banner"
-                width={500}
-                height={200}
-                className="rounded-md"
-              />
-            ) : (
-              <div className="h-32 bg-gray-700 rounded-md"></div>
-            )}
-          </div>
-          <div className="text-center mt-4">
-            {profileData.profile_image_url ? (
-              <Image
-                src={profileData.profile_image_url}
-                alt="Profile"
-                width={96}
-                height={96}
-                className="rounded-full mx-auto"
-              />
-            ) : (
-              <div className="w-24 h-24 bg-gray-500 rounded-full mx-auto"></div>
-            )}
-          </div>
-          <h3 className="text-2xl font-bold mt-4">{profileData.display_name}</h3>
-          <p className="text-sm text-gray-400">@{profileData.username}</p>
-          <p className="mt-2">{profileData.about}</p>
-          <div className="mt-4">
-            <p>
-              <strong>Membership:</strong> {profileData.membership_tier}
-            </p>
-            <p>
-              <strong>Role:</strong> {profileData.role}
-            </p>
-            <p>
-              <strong>Profile Type:</strong> {profileData.profile_type}
-            </p>
-          </div>
-          <button
-            className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
+      <div className="w-full md:w-2/3 bg-gray-800 p-6 rounded-lg shadow-lg">
+        {/* Banner Image */}
+        <div className="text-center">
+          {activeProfile.bannerImageUrl ? (
+            <Image
+              src={activeProfile.bannerImageUrl}
+              alt="Banner"
+              width={500}
+              height={200}
+              className="rounded-md"
+            />
+          ) : (
+            <div className="h-32 bg-gray-700 rounded-md"></div>
+          )}
         </div>
-      )}
+
+        {/* Profile Image */}
+        <div className="text-center mt-4">
+          {activeProfile.profileImageUrl ? (
+            <Image
+              src={activeProfile.profileImageUrl}
+              alt="Profile"
+              width={96}
+              height={96}
+              className="rounded-full mx-auto"
+            />
+          ) : (
+            <div className="w-24 h-24 bg-gray-500 rounded-full mx-auto"></div>
+          )}
+        </div>
+
+        {/* Profile Details */}
+        <h3 className="text-2xl font-bold mt-4">{activeProfile.displayName}</h3>
+        <p className="text-sm text-gray-400">@{activeProfile.username}</p>
+        <p className="mt-2">{activeProfile.about}</p>
+
+        {/* Additional Profile Information */}
+        <div className="mt-4">
+          <p>
+            <strong>Membership:</strong> {activeProfile.membershipTier}
+          </p>
+          <p>
+            <strong>Role:</strong> {activeProfile.role}
+          </p>
+          <p>
+            <strong>Profile Type:</strong> {activeProfile.profileType}
+          </p>
+        </div>
+
+        {/* Switch Profile Dropdown */}
+        <div className="mt-6">
+          <strong>Switch Profile:</strong>
+          <select
+            className="block w-full mt-2 p-2 bg-gray-700 text-white rounded-md"
+            onChange={(e) => handleSwitchProfile(e.target.value)}
+            value={activeWallet}
+          >
+            {profiles.map((profile) => (
+              <option key={profile.walletAddress} value={profile.walletAddress}>
+                {profile.displayName || profile.username}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Logout Button */}
+        <button
+          className={`mt-6 px-4 py-2 rounded-md transition ${
+            loading
+              ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+              : "bg-red-500 hover:bg-red-600 text-white"
+          }`}
+          onClick={handleLogout}
+          disabled={loading}
+        >
+          {loading ? "Logging Out..." : "Logout"}
+        </button>
+      </div>
     </div>
   );
 }
