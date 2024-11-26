@@ -1,13 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '../context/AuthContext'; // Import your context hook
 
 export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) {
-  const { walletAddress, profileImage } = useAuthContext();
+  const { walletAddress, profileImage, connect, connectors, logout } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  // Reconnect wallet on mount if necessary
+  useEffect(() => {
+    const reconnectWallet = async () => {
+      if (!walletAddress && connectors.length > 0 && !isConnecting) {
+        try {
+          setIsConnecting(true); // Prevent multiple connection attempts
+          await connect(connectors[0]);
+        } catch (error) {
+          console.error('Wallet reconnection failed:', error);
+        } finally {
+          setIsConnecting(false); // Reset after the connection attempt
+        }
+      }
+    };
+
+    reconnectWallet();
+  }, [walletAddress, connectors, connect, isConnecting]);
 
   const handleProfileHover = () => {
     setIsMenuOpen(true);
@@ -15,6 +34,10 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
 
   const handleProfileLeave = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout(); // Call logout function from AuthContext
   };
 
   return (
@@ -25,7 +48,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
       {/* Centered Logo Container */}
       <div className="flex-1 flex justify-center items-center">
         <Image
-          src={isDarkMode ? "/images/LOGODARK.png" : "/images/LogoLIGHT.png"} // Conditional logo path
+          src={isDarkMode ? '/images/LOGODARK.png' : '/images/LogoLIGHT.png'} // Conditional logo path
           alt="Logo"
           width={240}
           height={40}
@@ -39,10 +62,10 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
         <button
           onClick={toggleTheme}
           className={`p-2 rounded-full border border-gray-600 transition ${
-            isDarkMode ? "bg-[#090909] text-white" : "bg-white text-black"
+            isDarkMode ? 'bg-[#090909] text-white' : 'bg-white text-black'
           }`}
         >
-          {isDarkMode ? "☀️" : "🌙"}
+          {isDarkMode ? '☀️' : '🌙'}
         </button>
 
         {/* Profile Image or Connect Button */}
@@ -54,7 +77,7 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
           >
             <Link href="/profile">
               <Image
-                src={profileImage || "/images/default_logo.jpg"} // Fallback to default image
+                src={profileImage || '/images/default_logo.jpg'} // Fallback to default image
                 alt="Profile Image"
                 width={40}
                 height={40}
@@ -65,14 +88,19 @@ export default function TopBar({ isDarkMode, toggleTheme }: { isDarkMode: boolea
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-10">
                 <ul className="py-2">
                   <li className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">Account Settings</li>
-                  <li className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">Logout</li>
+                  <li
+                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </li>
                 </ul>
               </div>
             )}
           </div>
         ) : (
           // Use the <appkit-button> component for wallet and email connection
-          <w3m-button/>
+          <appkit-button theme-mode={isDarkMode ? 'dark' : 'light'}></appkit-button>
         )}
       </div>
     </div>

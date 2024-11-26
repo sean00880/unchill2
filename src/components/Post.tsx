@@ -1,199 +1,314 @@
-// src/components/Post.tsx
 "use client";
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Comment from './Comment'; // Import the Comment component
 
-// Sample data for comments (hardcoded for now)
-const sampleComments = [
-  {
-    username: 'DeFiExpert',
-    avatar: '/avatars/defiexpert.png',
-    timePosted: '30m ago',
-    content: 'Great post! I completely agree with your thoughts on DeFi.',
-    media: ['/images/comment_image.png'],
-    verified: true,
-  },
-  {
-    username: 'CryptoAnalyst',
-    avatar: '/avatars/cryptoanalyst.png',
-    timePosted: '45m ago',
-    content: 'DeFi is the future! Thanks for sharing your insights.',
-    verified: false,
-  },
-];
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation"; // For dynamic URL navigation
+import { supabase } from "../utils/supaBaseClient";
+import Comment from "./Comment";
+import { useAuthContext } from "../context/AuthContext";
 
-interface PostProps {
+interface Profile {
+  id: string;
+  display_name: string;
   username: string;
-  avatar: string;
-  timePosted: string;
-  content: string;
-  isDarkMode: boolean;
+  profile_image: string;
   verified: boolean;
-  media?: string[]; // Array of image URLs
+  links: number; // Followers count
 }
 
-const Post: React.FC<PostProps> = ({ username, avatar, timePosted, content, isDarkMode, verified, media }) => {
-  const [thumbsUpCount, setThumbsUpCount] = useState(0);
-  const [thumbsDownCount, setThumbsDownCount] = useState(0);
-  const [userReaction, setUserReaction] = useState<null | 'up' | 'down'>(null);
+interface CommentProps {
+  id: string;
+  profile_id: string;
+  post_id: string;
+  content: string;
+  media?: string[];
+  timestamp: string;
+  likes: number;
+  dislikes: number;
+  boosts: number;
+  reshares: number;
+  comments_count: number;
+  username: string;
+  profile_image_url: string;
+  membership_tier: string;
+}
+
+interface PostProps {
+  post: {
+    id: string;
+    profile_id: string;
+    content: string;
+    media: string[];
+    timestamp: string;
+    likes: number;
+    dislikes: number;
+    boosts: number;
+    reshares: number;
+    comments_count: number;
+  };
+  isDarkMode: boolean;
+}
+
+const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
+  const { accountIdentifier, username } = useAuthContext();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [comments, setComments] = useState<CommentProps[]>([]);
+  const [likes, setLikes] = useState(post.likes);
+  const [dislikes, setDislikes] = useState(post.dislikes);
+  const [boosts, setBoosts] = useState(post.boosts);
+  const [reshares, setReshares] = useState(post.reshares);
+  const [userReaction, setUserReaction] = useState<null | "like" | "dislike">(null);
   const [isCommentsVisible, setIsCommentsVisible] = useState(false);
-  const [commentsCount, setCommentsCount] = useState(30); // Example count
-  const [resharesCount, setResharesCount] = useState(14); // Example count
-  const [boostsCount, setBoostsCount] = useState(299); // Example count
-  const [linkedProfilesCount, setLinkedProfilesCount] = useState(68); // Example count for "Linked" profiles
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleThumbsUp = () => {
-    if (userReaction === 'up') {
-      setThumbsUpCount(thumbsUpCount - 1);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number | null>(null); // Modal state for image
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, username, profile_image, links, membership_tier")
+        .eq("id", post.profile_id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching profile:", error.message);
+        return;
+      }
+
+      const verified = data.membership_tier === "verified";
+
+      setProfile({
+        id: data.id,
+        display_name: data.display_name,
+        username: data.username,
+        profile_image: data.profile_image || "/default-avatar.png",
+        links: data.links || 0,
+        verified,
+      });
+    };
+
+    fetchProfile();
+  }, [post.profile_id]);
+
+  useEffect(() => {
+    if (isCommentsVisible) {
+      const fetchComments = async () => {
+        const { data, error } = await supabase
+          .from("replies")
+          .select(
+            "id, profile_id, post_id, content, media, timestamp, likes, dislikes, boosts, reshares, comments_count, username, profile_image_url, membership_tier"
+          )
+          .eq("post_id", post.id);
+
+        if (error) {
+          console.error("Error fetching comments:", error.message);
+          return;
+        }
+
+        setComments(data || []);
+      };
+
+      fetchComments();
+    }
+  }, [isCommentsVisible, post.id]);
+
+  const openImageModal = (index: number) => {
+    setCurrentImageIndex(index);
+    router.push(`/post/${post.id}/image/${index + 1}`);
+  };
+
+  const closeImageModal = () => {
+    setCurrentImageIndex(null);
+    router.back();
+  };
+
+  const navigateImage = (direction: "next" | "prev") => {
+    if (currentImageIndex === null) return;
+
+    const newIndex =
+      direction === "next"
+        ? (currentImageIndex + 1) % post.media.length
+        : (currentImageIndex - 1 + post.media.length) % post.media.length;
+
+    setCurrentImageIndex(newIndex);
+    router.push(`/post/${post.id}/image/${newIndex + 1}`);
+  };
+
+  const toggleCommentsVisibility = () => setIsCommentsVisible(!isCommentsVisible);
+
+  const handleReaction = async (type: "like" | "dislike") => {
+    if (!accountIdentifier) {
+      alert("You need to be logged in to interact with posts.");
+      return;
+    }
+
+    const isLike = type === "like";
+
+    if (userReaction === type) {
+      if (isLike) {
+        setLikes((prev) => prev - 1);
+      } else {
+        setDislikes((prev) => prev - 1);
+      }
       setUserReaction(null);
     } else {
-      setThumbsUpCount(thumbsUpCount + 1);
-      if (userReaction === 'down') setThumbsDownCount(thumbsDownCount - 1);
-      setUserReaction('up');
+      if (isLike) {
+        setLikes((prev) => prev + 1);
+      } else {
+        setDislikes((prev) => prev + 1);
+      }
+
+      if (userReaction) {
+        if (userReaction === "like") {
+          setLikes((prev) => prev - 1);
+        } else {
+          setDislikes((prev) => prev - 1);
+        }
+      }
+
+      setUserReaction(type);
     }
+
+    const updatedReactions = {
+      likes: isLike ? likes + 1 : likes,
+      dislikes: !isLike ? dislikes + 1 : dislikes,
+    };
+
+    await supabase.from("posts").update(updatedReactions).eq("id", post.id);
   };
 
-  const handleThumbsDown = () => {
-    if (userReaction === 'down') {
-      setThumbsDownCount(thumbsDownCount - 1);
-      setUserReaction(null);
-    } else {
-      setThumbsDownCount(thumbsDownCount + 1);
-      if (userReaction === 'up') setThumbsUpCount(thumbsUpCount - 1);
-      setUserReaction('down');
+  const handleBoost = async () => {
+    if (!accountIdentifier) {
+      alert("You need to be logged in to boost posts.");
+      return;
     }
+    setBoosts(boosts + 1);
+    await supabase.from("posts").update({ boosts: boosts + 1 }).eq("id", post.id);
   };
 
-  const handleImageClick = (image: string) => {
-    setPreviewImage(image);
-  };
-
-  const handleClosePreview = () => {
-    setPreviewImage(null);
-  };
-
-  const toggleCommentsVisibility = () => {
-    setIsCommentsVisible(!isCommentsVisible);
+  const handleReshare = async () => {
+    if (!accountIdentifier) {
+      alert("You need to be logged in to reshare posts.");
+      return;
+    }
+    setReshares(reshares + 1);
+    await supabase.from("posts").update({ reshares: reshares + 1 }).eq("id", post.id);
   };
 
   const renderMedia = () => {
-    if (!media || media.length === 0) return null;
-
-    if (media.length === 1) {
-      return (
-        <div className="col-span-1">
-          <Image
-            src={media[0]}
-            alt="Single post media"
-            width={500}
-            height={500}
-            className="rounded-lg object-cover w-full cursor-pointer"
-            onClick={() => handleImageClick(media[0])}
-          />
-        </div>
-      );
-    }
+    if (!post.media || post.media.length === 0) return null;
 
     return (
-      <div className={`post-media grid ${media.length <= 2 ? 'grid-cols-2' : 'grid-cols-2'} gap-2`}>
-        {media.slice(0, 4).map((image, index) => (
-          <div key={index} className="relative">
-            <Image
-              src={image}
-              alt={`Post media ${index + 1}`}
-              width={250}
-              height={250}
-              className="rounded-lg object-cover w-full h-full cursor-pointer"
-              onClick={() => handleImageClick(image)}
-            />
-            {index === 3 && media.length > 4 && (
-              <div className="absolute inset-0 bg-[#090909] bg-opacity-50 flex items-center justify-center text-white font-bold text-xl rounded-lg">
-                +{media.length - 4}
-              </div>
-            )}
+      <div className="post-media grid grid-cols-2 gap-2">
+        {post.media.map((image, index) => (
+          <div key={index} className="relative cursor-pointer" onClick={() => openImageModal(index)}>
+            <Image src={image} alt={`Post media ${index + 1}`} width={250} height={250} className="rounded-lg" />
           </div>
         ))}
       </div>
     );
   };
-
   return (
-    <div className={`post mb-6 p-4 border rounded-lg ${isDarkMode ? 'text' : 'bg-white text-gray-800'}`}>
-      <div className="post-header flex items-center justify-between mb-2">
-        <div className="flex items-center">
-          <Image src={avatar} alt={`${username}'s avatar`} width={40} height={40} className="rounded-full mr-3" />
-          <div>
-            <span className="font-semibold flex items-center">
-              {username}
-              {verified && (
-                <Image
-                  src="/icons/verified.png"
-                  alt="Verified icon"
-                  className="w-4 h-4 ml-1"
-                  width={16}
-                  height={16}
-                />
-              )}
-            </span>
-            <div className="mt-2">
-        <span className="text-sm">{linkedProfilesCount} Linked</span>
-      </div>
-            <span className="text-sm text-gray-500"> • {timePosted}</span>
+    <>
+      <div
+        className={`post mb-6 p-4 border rounded-lg ${isDarkMode ? "bg-black text-white" : "bg-white text-gray-800"}`}
+      >
+        {profile && (
+          <div className="post-header flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <Image
+                src={profile.profile_image}
+                alt="Profile"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <div className="ml-3">
+                <span className="font-semibold flex items-center">
+                  {profile.display_name}
+                  {profile.verified && (
+                    <Image src="/icons/verified2.png" alt="Verified" width={16} height={16} className="ml-1" />
+                  )}
+                </span>
+                <p className="text-sm text-gray-500">
+                  @{profile.username} • {new Date(post.timestamp).toLocaleString()}
+                </p>
+                <p className="text-sm">{profile.links} Followers</p>
+              </div>
+            </div>
+            {profile.username === username && (
+              <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)}>
+                ⋮
+              </button>
+            )}
+            {menuOpen && (
+              <div className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-lg shadow-lg">
+                <button className="block w-full text-left px-4 py-2">Edit</button>
+                <button className="block w-full text-left px-4 py-2">Delete</button>
+              </div>
+            )}
           </div>
+        )}
+        <p className="text-base mb-3">{post.content}</p>
+        {renderMedia()}
+        <div className="post-interactions flex justify-between mt-3">
+          <button onClick={() => handleReaction("like")} className="interaction-button">
+            👍 {likes}
+          </button>
+          <button onClick={() => handleReaction("dislike")} className="interaction-button">
+            👎 {dislikes}
+          </button>
+          <button onClick={toggleCommentsVisibility} className="interaction-button">
+            💬 {comments.length} Comments
+          </button>
+          <button onClick={handleReshare} className="interaction-button">
+            🔁 {reshares} Reshares
+          </button>
+          <button onClick={handleBoost} className="interaction-button">
+            🚀 {boosts} Boosts
+          </button>
         </div>
-        <div className="flex items-center flex-col">
-            <div className="row">
-          <button onClick={handleThumbsUp} className={`mr-2 ${userReaction === 'up' ? 'text-yellow-500' : 'text-gray-500'}`}>
-            👍 {thumbsUpCount}
-          </button>
-          <button onClick={handleThumbsDown} className={`${userReaction === 'down' ? 'text-red-500' : 'text-gray-500'}`}>
-            👎 {thumbsDownCount}
-          </button>
+        {isCommentsVisible && (
+          <div className="comments-section mt-4">
+            {comments.map((comment) => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
           </div>
-          
-        </div>
-        
+        )}
       </div>
-      <p className="text-base mb-3">{content}</p>
-      {renderMedia()}
-      <div className="post-interactions flex justify-between mt-3">
-        <button className="button" onClick={toggleCommentsVisibility}>
-          💬 <br/>
-          {commentsCount} Comments
-        </button>
-        <button className="button">
-          🔁 <br/>
-          {resharesCount} Reshares
-        </button>
-        <button className="button">
-          🚀 <br/>
-          {boostsCount} Boosts
-        </button>
-      </div>
-     
 
-      {previewImage && (
-        <div className="fixed inset-0 bg-[#090909] bg-opacity-70 flex items-center justify-center z-50">
+      {/* Full-Screen Modal */}
+      {currentImageIndex !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+          <button className="absolute top-4 left-4 text-white text-2xl" onClick={closeImageModal}>
+            ✖
+          </button>
+          <button className="absolute left-4 text-white text-2xl" onClick={() => navigateImage("prev")}>
+            ◀
+          </button>
           <div className="relative">
-            <Image src={previewImage} alt="Preview" width={600} height={600} className="rounded-lg" />
-            <button onClick={handleClosePreview} className="absolute top-2 right-2 text-white text-2xl">
-              ✖
-            </button>
+            <Image
+              src={post.media[currentImageIndex]}
+              alt={`Post media ${currentImageIndex + 1}`}
+              width={800}
+              height={800}
+              className="rounded-lg"
+            />
+          </div>
+          <button className="absolute right-4 text-white text-2xl" onClick={() => navigateImage("next")}>
+            ▶
+          </button>
+          <div className="absolute top-4 right-4 bg-white p-4 rounded-lg">
+            <h3 className="text-lg font-bold">Comments</h3>
+            {comments.map((comment) => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
           </div>
         </div>
       )}
-
-      {isCommentsVisible && (
-        <div className="comments-section mt-4">
-          <h4 className=" mb-2">Comment</h4>
-          {sampleComments.map((comment, index) => (
-            <Comment key={index} {...comment} />
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 

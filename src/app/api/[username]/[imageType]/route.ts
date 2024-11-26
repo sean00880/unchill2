@@ -5,43 +5,77 @@ export async function GET(req: NextRequest) {
   try {
     console.log("Request received:", req.url);
 
-    // Extract route parameters from the URL
-    const username = req.nextUrl.pathname.split("/")[3];
-    const imageType = req.nextUrl.pathname.split("/")[4];
+    // Extract parameters
+    const pathSegments = req.nextUrl.pathname.split("/").filter(Boolean);
+    const username = decodeURIComponent(pathSegments[1]); // `[username]`
+    const imageType = decodeURIComponent(pathSegments[2]); // `[imageType]`
 
     console.log("Extracted params:", { username, imageType });
 
     if (!username || !imageType) {
-      return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid parameters. Both username and imageType are required." },
+        { status: 400 }
+      );
     }
 
-    // Build the file path
-    const filePath = `${username}/${imageType}`;
-    console.log("Fetching image from path:", filePath);
+    // Fetch the list of files for the user from the Supabase bucket
+    const { data: files, error: listError } = await supabase.storage
+      .from("profile-images")
+      .list(username);
 
-    // Fetch the image from Supabase Storage
-    const { data, error } = await supabase.storage
+    if (listError || !files) {
+      console.error("Error fetching file list from storage:", listError?.message || "No files returned");
+      return NextResponse.json(
+        { error: "No files found for the specified username in the storage bucket." },
+        { status: 404 }
+      );
+    }
+
+    // Determine the specific file for the imageType
+    const targetFile = files.find((file) =>
+      file.name.startsWith(imageType)
+    );
+
+    if (!targetFile) {
+      return NextResponse.json(
+        { error: `No file found for type ${imageType} under username ${username}.` },
+        { status: 404 }
+      );
+    }
+
+    const filePath = `${username}/${targetFile.name}`;
+    console.log("Resolved file path:", filePath);
+
+    // Fetch the image from Supabase storage
+    const { data: fileData, error: fileError } = await supabase.storage
       .from("profile-images")
       .download(filePath);
 
-    if (error || !data) {
-      console.error("Error fetching image:", error?.message || "No data returned");
-      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    if (fileError || !fileData) {
+      console.error("Error fetching image from storage:", fileError?.message || "No data returned");
+      return NextResponse.json(
+        { error: "Image not found in storage. Ensure the file path is correct." },
+        { status: 404 }
+      );
     }
 
-    // Convert the binary data to a Buffer
-    const buffer = await data.arrayBuffer();
+    console.log("Image successfully fetched from storage:", filePath);
 
-    // Serve the image directly as a binary stream
+    // Serve the image binary directly
+    const buffer = await fileData.arrayBuffer();
     return new NextResponse(Buffer.from(buffer), {
       headers: {
-        "Content-Type": data.type, // Dynamic content type
-        "Cache-Control": "public, max-age=3600", // Optional caching
-        "Access-Control-Allow-Origin": "*", // Allow all origins
+        "Content-Type": fileData.type || "application/octet-stream",
+        "Cache-Control": "public, max-age=3600",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   } catch (err) {
-    console.error("Unexpected error occurred:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Unexpected error:", err);
+    return NextResponse.json(
+      { error: "Internal server error. Unable to fetch the image." },
+      { status: 500 }
+    );
   }
 }

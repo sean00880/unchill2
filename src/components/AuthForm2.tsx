@@ -11,7 +11,6 @@ import Footer from "./Footer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getProfileImageUrl } from "../utils/imageUtils";
-import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 interface ProfileData {
   id: string;
@@ -43,7 +42,6 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
     about: "",
   });
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const authState = useAuthRedirect();
   
 
   const {
@@ -60,17 +58,40 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (authState === "connect") setCurrentStep(1);
-    else if (authState === "create-profile") setCurrentStep(2);
-    else if (authState === "overview") setCurrentStep(3);
-  }, [authState]);
-
- 
+    const initializeAuthFlow = async () => {
+      if (!walletAddress) {
+        router.replace("/auth#connect");
+        return;
+      }
+  
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("account_identifier", accountIdentifier)
+          .single();
+  
+        if (error || !data) {
+          setCurrentStep(2); // Move to profile creation
+          router.replace("/auth#create-profile");
+        } else {
+          setProfileData(data); // Load the existing profile
+          router.replace("/auth#overview");
+        }
+      } catch (error) {
+        console.error("Error during auth flow:", error);
+        router.replace("/auth#connect");
+      }
+    };
+  
+    initializeAuthFlow();
+  }, [walletAddress, accountIdentifier, router]);
+  
 
   const handleLogout = async () => {
     await logout();
     setProfileData(null);
-    router.push("/auth/connect");
+    router.push("/auth#connect");
   };
 
   const validateDisplayName = (value: string) => {
@@ -198,7 +219,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
   
       console.log("Profile created successfully:", data);
       setAlertMessage("Profile created successfully!");
-      router.push("/auth/overview");
+      router.push("/auth#Overview");
     } catch (err) {
       console.error("Error creating profile:", err);
       setAlertMessage("Failed to create profile. Please try again.");
@@ -225,14 +246,14 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
 
   const handleCloseAlert = () => setAlertMessage(null);
 
-  const containerStyle = `${isDarkMode ? "bg-black" : "bg-white/80"} backdrop-blur-md border rounded-lg p-6 shadow-lg`;
+  const containerStyle = `${isDarkMode ? "" : "bg-white/80"} backdrop-blur-md border rounded-lg p-6 shadow-lg`;
 
   const customUploadButtonStyle = `
     py-2 px-4 mt-2 bg-white/20 border border-white/30 rounded-lg
     shadow-xl backdrop-blur-md hover:bg-white/30 transition-all duration-300
     cursor-pointer transform hover:scale-105 text
   `;
-  if (authState === "overview" && profileData) {
+  if (profileData) {
     const profileImageUrl = getProfileImageUrl(profileData.username, "profile");
     const bannerImageUrl = getProfileImageUrl(profileData.username, "banner");
   
@@ -342,7 +363,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
               </motion.h2>
 
               {/* Step 1: Connect */}
-              {authState === "connect" && currentStep === 1 && (
+              {currentStep === 1 && (
                 <motion.div className="flex flex-col w-[50%] self-center items-center justify-center">
                   <w3m-button />
                   <button
@@ -355,7 +376,7 @@ export default function AuthForm({ isDarkMode }: { isDarkMode: boolean }) {
               )}
 
               {/* Step 2: Create Profile */}
-              {authState === "create-profile" && currentStep === 2 && (
+              {currentStep === 2 && (
                 <form>
                   <h6 className="absolute top-2 right-2 text-sm">
                     <span className="text-red-500">*</span>{" "}

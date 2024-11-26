@@ -30,8 +30,12 @@ interface AuthContextType {
   setDisplayName: (name: string) => void;
   username: string;
   setUsername: (name: string) => void;
+  about: string;
+  setAbout: (about: string) => void;
   profileImage: string | null;
   setProfileImage: (image: string | null) => void;
+  bannerImage: string | null;
+  setBannerImage: (image: string | null) => void;
   walletAddress: string | null;
   accountIdentifier: string | null;
   isVerified: boolean;
@@ -52,144 +56,116 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const { disconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress } = useAppKitAccount();
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  const [displayName, setDisplayName] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      return localStorage.getItem("displayName") || "";
-    } catch (error) {
-      console.error("Failed to load displayName from localStorage:", error);
-      return "";
+  // States for user profile
+  const [displayName, setDisplayName] = useState<string>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("displayName") || "" : ""
+  );
+  const [username, setUsername] = useState<string>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("username") || "" : ""
+  );
+  const [about, setAbout] = useState<string>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("about") || "" : ""
+  );
+  const [profileImage, setProfileImage] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("profileImage") || null : null
+  );
+  const [bannerImage, setBannerImage] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("bannerImage") || null : null
+  );
+  const [isVerified, setIsVerified] = useState<boolean>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("isVerified") === "true" : false
+  );
+  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("accountIdentifier") || null : null
+  );
+
+  // Ensure alertMessage is used properly in the component
+  useEffect(() => {
+    if (alertMessage) {
+      alert(alertMessage); // Use alert or a modal
+      setAlertMessage(null); // Reset after showing the message
     }
-  });
+  }, [alertMessage]);
 
-  const [username, setUsername] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      return localStorage.getItem("username") || "";
-    } catch (error) {
-      console.error("Failed to load username from localStorage:", error);
-      return "";
-    }
-  });
-
-  const [profileImage, setProfileImage] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      return localStorage.getItem("profileImage") || null;
-    } catch (error) {
-      console.error("Failed to load profileImage from localStorage:", error);
-      return null;
-    }
-  });
-
-  const [isVerified, setIsVerified] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem("isVerified") === "true";
-    } catch (error) {
-      console.error("Failed to load isVerified from localStorage:", error);
-      return false;
-    }
-  });
-
-  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      return localStorage.getItem("accountIdentifier") || null;
-    } catch (error) {
-      console.error("Failed to load accountIdentifier from localStorage:", error);
-      return null;
-    }
-  });
-
+  // Sync accountIdentifier with wallet connection
   useEffect(() => {
     if (isConnected && caipAddress) {
       setAccountIdentifier(caipAddress);
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("accountIdentifier", caipAddress);
-        }
-      } catch (error) {
-        console.error("Failed to save accountIdentifier to localStorage:", error);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accountIdentifier", caipAddress);
       }
     }
   }, [isConnected, caipAddress]);
 
+  // Sync states with localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("displayName", displayName);
+      localStorage.setItem("username", username);
+      localStorage.setItem("about", about);
+
+      if (profileImage) {
+        localStorage.setItem("profileImage", profileImage);
+      } else {
+        localStorage.removeItem("profileImage");
+      }
+
+      if (bannerImage) {
+        localStorage.setItem("bannerImage", bannerImage);
+      } else {
+        localStorage.removeItem("bannerImage");
+      }
+
+      localStorage.setItem("isVerified", isVerified.toString());
+    }
+  }, [displayName, username, about, profileImage, bannerImage, isVerified]);
+
+  // Load profile data if connected
+  useEffect(() => {
+    if (isConnected && accountIdentifier) {
+      setDisplayName(localStorage.getItem("displayName") || "");
+      setUsername(localStorage.getItem("username") || "");
+    }
+  }, [isConnected, accountIdentifier]);
+
+  // Handle cookies for debugging
   useEffect(() => {
     if (cookies) {
       console.log("Cookies received:", cookies);
     }
   }, [cookies]);
 
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("displayName", displayName);
-      }
-    } catch (error) {
-      console.error("Failed to save displayName to localStorage:", error);
-    }
-  }, [displayName]);
-
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("username", username);
-      }
-    } catch (error) {
-      console.error("Failed to save username to localStorage:", error);
-    }
-  }, [username]);
-
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        if (profileImage) {
-          localStorage.setItem("profileImage", profileImage);
-        } else {
-          localStorage.removeItem("profileImage");
-        }
-      }
-    } catch (error) {
-      console.error("Failed to save or remove profileImage in localStorage:", error);
-    }
-  }, [profileImage]);
-
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("isVerified", isVerified.toString());
-      }
-    } catch (error) {
-      console.error("Failed to save isVerified to localStorage:", error);
-    }
-  }, [isVerified]);
-
-  const logout = () => {
+  // Logout functionality
+  const logout = async () => {
     setDisplayName("");
     setUsername("");
+    setAbout("");
     setProfileImage(null);
+    setBannerImage(null);
     setIsVerified(false);
     setAccountIdentifier(null);
 
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.clear();
-      }
-    } catch (error) {
-      console.error("Failed to clear localStorage during logout:", error);
+    if (typeof window !== "undefined") {
+      localStorage.clear();
     }
 
-    disconnect();
+    // Disconnect wallet via AppKit
+    try {
+      await appKit.adapter?.connectionControllerClient?.disconnect();
+    } catch (error) {
+      console.error("Wallet disconnect error:", error);
+    }
   };
 
+  // Connection logic
   const handleConnect = async (connector: Connector): Promise<void> => {
     try {
       await connect({ connector });
     } catch (error) {
       console.error("Connection failed:", error);
-      throw error;
+      setAlertMessage("Wallet connection failed. Please try again.");
     }
   };
 
@@ -202,8 +178,12 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
             setDisplayName,
             username,
             setUsername,
+            about,
+            setAbout,
             profileImage,
             setProfileImage,
+            bannerImage,
+            setBannerImage,
             walletAddress: address ?? null,
             accountIdentifier,
             isVerified,
