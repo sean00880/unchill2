@@ -2,8 +2,8 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
 import { Connector, useConnect, useDisconnect } from "wagmi";
-import { wagmiAdapter, projectId } from "../lib/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { wagmiAdapter, projectId } from "../lib/config";
 import { WagmiProvider } from "wagmi";
 import { createAppKit } from "@reown/appkit";
 import { mainnet, base, bsc } from "@reown/appkit/networks";
@@ -34,10 +34,10 @@ interface Profile {
 interface AuthContextType {
   walletAddress: string | null;
   accountIdentifier: string | null;
-  profiles: Record<string, Profile>; // Profiles by wallet
-  walletProfiles: Record<string, Profile>; // Alias for better integration
+  profiles: Record<string, Profile>;
+  walletProfiles: Record<string, Profile>;
   activeWallet: string | null;
-  profileImage: string | null; // Profile image of the active wallet
+  profileImage: string | null;
   activeProfile: Profile | null;
   setActiveWallet: (walletAddress: string) => void;
   connect: (connector: Connector) => Promise<void>;
@@ -49,10 +49,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
   children: ReactNode;
-  cookies?: string | null;
 };
 
-export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress } = useAppKitAccount();
@@ -100,14 +99,25 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   }, [profiles]);
 
   // Wallet connect logic
-  const handleConnect = async (connector: Connector): Promise<void> => {
-    try {
-      await connect({ connector });
-    } catch (error) {
-      console.error("Wallet connection failed:", error);
-      alert("Wallet connection failed. Please try again.");
+const handleConnect = async (connector: Connector): Promise<void> => {
+  try {
+    await connect({ connector });
+
+    // Ensure the connector supports `getAddress` and explicitly cast its type
+    if ('getAddress' in connector && typeof connector.getAddress === 'function') {
+      const newAddress = await connector.getAddress() as string;
+      setWalletAddress(newAddress);
+    } else {
+      throw new Error("Connector does not support getAddress method.");
     }
-  };
+  } catch (error) {
+    console.error("Wallet connection failed:", error);
+    alert("Wallet connection failed. Please try again.");
+  }
+};
+
+
+  
 
   // Wallet disconnect logic
   const handleDisconnect = async (): Promise<void> => {
@@ -163,6 +173,8 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
 
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuthContext must be used within an AuthProvider");
+  if (!context) {
+    throw new Error("useAuthContext must be used within an AuthProvider");
+  }
   return context;
 };
