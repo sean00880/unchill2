@@ -132,7 +132,13 @@ export default function CreateProfilePage() {
       setShowRedirect(true); // Show modal for redirect
     } catch (error) {
       console.error("Profile creation failed:", error); // Log the error for debugging
-      setAlertMessage(error.message || "Failed to create profile.");
+  
+      // Narrow the error type to properly access the `message` property
+      if (error instanceof Error) {
+        setAlertMessage(error.message);
+      } else {
+        setAlertMessage("Failed to create profile due to an unknown error.");
+      }
     } finally {
       setLoading(false);
     }
