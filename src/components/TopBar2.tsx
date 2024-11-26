@@ -3,163 +3,137 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Connector } from "wagmi";
+import { Profile } from "../context/AuthContext";
 
-export default function TopBar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function TopBar({
+  isDarkMode,
+  toggleTheme,
+  walletAddress,
+  activeProfile,
+  profiles,
+  connect,
+  disconnect,
+  profileImage,
+  connectors,
+  setActiveWallet,
+}: {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+  walletAddress: string | null;
+  activeProfile: Profile | null;
+  profiles: Profile[];
+  profileImage: string | null;
+  connect: (connector: Connector) => Promise<void>;
+  disconnect: () => Promise<void>;
+  connectors: readonly Connector[];
+  setActiveWallet: (walletAddress: string) => void;
+}) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const handleProfileHover = () => {
+    setIsMenuOpen(true);
+  };
+
+  const handleProfileLeave = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleConnect = async () => {
+    if (connectors.length > 0 && !isConnecting) {
+      try {
+        setIsConnecting(true);
+        await connect(connectors[0]); // Attempt to connect using the first connector
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+      } finally {
+        setIsConnecting(false);
+      }
+    }
   };
 
   return (
-    <div className="topbar flex items-center justify-between px-4 py-4 shadow-lg border-b border-[#ffbf00] relative">
-      {/* Hamburger Menu for Mobile */}
-      <div className="flex md:hidden">
-        <button
-          className={`hamburger ${isMobileMenuOpen ? "open" : ""}`}
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-        >
-          <div className="line"></div>
-          <div className="line"></div>
-          <div className="line"></div>
-        </button>
-      </div>
+    <div className="topbar flex items-center justify-between px-4 py-2 shadow-lg border-b border-gray-700">
+      {/* Left Spacer */}
+      <div className="w-1/3"></div>
 
-      {/* Centered Logo Container */}
-      <div className="flex-1 md:flex-none flex justify-center items-center">
-        <Link href="#">
+      {/* Centered Logo */}
+      <div className="flex-1 flex justify-center items-center">
         <Image
-          src="/images/LOGODARK.png" // Static logo path for simplicity
+          src={isDarkMode ? "/images/LOGODARK.png" : "/images/LogoLIGHT.png"}
           alt="Logo"
           width={240}
           height={40}
           className="glitch-effect"
-        /></Link>
+        />
       </div>
 
-      {/* Desktop Navigation Links */}
-      <nav className="hidden md:flex w-1/3 justify-end items-center space-x-4 lg:space-x-6">
-        <Link href="/#home" className="hover:text-yellow-500 transition">
-          Home
-        </Link>
-        <div className="group relative">
-          <Link href="/#about" className="hover:text-yellow-500 transition">
-            About
-          </Link>
-          {/* Submenu for About */}
-          <div className="absolute left-[-120%] transform bg-black text-white p-2 rounded shadow-lg hidden group-hover:block">
-            <Link href="/#defi-social-network" className="block px-2 py-1 hover:bg-gray-800 rounded">
-              DeFi Social Network
-            </Link>
-            <Link href="/#gamefi" className="block px-2 py-1 hover:bg-gray-800 rounded">
-              GameFi
-            </Link>
-            <Link href="/#memes" className="block px-2 py-1 hover:bg-gray-800 rounded">
-              Memes
-            </Link>
-          </div>
-        </div>
-        <Link href="/#tokenomics" className="hover:text-yellow-500 transition">
-          Tokenomics
-        </Link>
-        <Link href="/#roadmap" className="hover:text-yellow-500 transition">
-          Roadmap
-        </Link>
-        <Link href="/#whitepaper" className="hover:text-yellow-500 transition">
-          Whitepaper
-        </Link>
-        <div className="group relative">
-          <Link href="/#resources" className="hover:text-yellow-500 transition">
-            Resources
-          </Link>
-          {/* Submenu for Resources */}
-          <div className="absolute left-[-120%] transform bg-black text-white p-2 rounded shadow-lg hidden group-hover:block">
-            <Link href="#blog" className="block px-2 py-1 hover:bg-gray-800 rounded">
-              Blog
-            </Link>
-            <Link href="#documentation" className="block px-2 py-1 hover:bg-gray-800 rounded">
-              Documentation
-            </Link>
-          </div>
-        </div>
-      </nav>
+      {/* Wallet/Profile Actions */}
+      <div className="w-1/3 flex justify-end items-center space-x-4">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className={`p-2 rounded-full border border-gray-600 transition ${
+            isDarkMode ? "bg-[#090909] text-white" : "bg-white text-black"
+          }`}
+        >
+          {isDarkMode ? "☀️" : "🌙"}
+        </button>
 
-      {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="block absolute top-16 left-0 w-full bg-gray-900 text-white p-4 shadow-lg rounded-lg z-50">
-          <Link href="/#home" className="block px-4 py-2 hover:bg-black rounded">
-            Home
-          </Link>
-          <div className="group relative">
-            <Link href="/#about" className="block px-4 py-2 hover:bg-black rounded">
-              About
+        {/* Wallet and Profile Section */}
+        {walletAddress ? (
+          <div
+            className="relative"
+            onMouseEnter={handleProfileHover}
+            onMouseLeave={handleProfileLeave}
+          >
+            
+            <Link href="/profile">
+              <Image
+                src={profileImage || "/images/default_logo.jpg"}
+                alt="Profile Image"
+                width={40}
+                height={40}
+                className="rounded-full cursor-pointer"
+              />
             </Link>
-            <div className="pl-4 mt-2 hidden group-hover:block">
-              <Link href="/#defi-social-network" className="block px-2 py-1 hover:bg-black rounded">
-                DeFi Social Network
-              </Link>
-              <Link href="/#gamefi" className="block px-2 py-1 hover:bg-black rounded">
-                GameFi
-              </Link>
-              <Link href="/#memes" className="block px-2 py-1 hover:bg-black rounded">
-                Memes
-              </Link>
-            </div>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-10">
+                <ul className="py-2">
+                  {profiles.map((profile) => (
+                    <li
+                      key={profile.walletAddress}
+                      className={`px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
+                        activeProfile?.walletAddress === profile.walletAddress
+                          ? "font-bold"
+                          : ""
+                      }`}
+                      onClick={() => setActiveWallet(profile.walletAddress)}
+                    >
+                      {profile.displayName || profile.username}
+                      <br/> <Link href="/settings">Account Settings</Link>
+                    </li>
+                  ))}
+                  <li
+                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer text-red-500"
+                    onClick={disconnect}
+                  >
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
-          <Link href="/#tokenomics" className="block px-4 py-2 hover:bg-black rounded">
-            Tokenomics
-          </Link>
-          <Link href="/#roadmap" className="block px-4 py-2 hover:bg-black rounded">
-            Roadmap
-          </Link>
-          <Link href="/#whitepaper" className="block px-4 py-2 hover:bg-black rounded">
-            Whitepaper
-          </Link>
-          <div className="group relative">
-            <Link href="/#resources" className="block px-4 py-2 hover:bg-black rounded">
-              Resources
-            </Link>
-            <div className="pl-4 mt-2 hidden group-hover:block">
-              <Link href="#blog" className="block px-2 py-1 hover:bg-black rounded">
-                Blog
-              </Link>
-              <Link href="#documentation" className="block px-2 py-1 hover:bg-black rounded">
-                Documentation
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hamburger Button Styling */}
-      <style jsx>{`
-        .hamburger {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          width: 24px;
-          height: 18px;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-        }
-        .line {
-          width: 100%;
-          height: 2px;
-          background-color: #ffffff;
-          transition: all 0.3s ease;
-        }
-        .hamburger.open .line:nth-child(1) {
-          transform: rotate(45deg) translateY(6px);
-        }
-        .hamburger.open .line:nth-child(2) {
-          opacity: 0;
-        }
-        .hamburger.open .line:nth-child(3) {
-          transform: rotate(-45deg) translateY(-6px);
-        }
-      `}</style>
+        ) : (
+          <button
+            onClick={handleConnect}
+            className="p-2 rounded-md border border-gray-600 bg-blue-500 text-white hover:bg-blue-600 transition"
+          >
+            Connect Wallet
+          </button>
+        )}
+      </div>
     </div>
   );
 }

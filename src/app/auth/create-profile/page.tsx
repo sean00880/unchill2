@@ -21,6 +21,10 @@ export default function CreateProfilePage() {
     profileType: "Individual",
     role: "Normie",
     membershipTier: "basic",
+    email: "", // New field
+    password: "", // New field (if needed)
+    linked: [], // New field (array)
+    links: [], // New field (array)
   });
 
   const [errors, setErrors] = useState({
@@ -110,11 +114,17 @@ export default function CreateProfilePage() {
         username: profileData.username,
         about: profileData.about,
         account_identifier: accountIdentifier,
+        wallet_address: walletAddress,
         profile_image_url: profileImageUrl,
         banner_image_url: bannerImageUrl,
         profile_type: profileData.profileType,
         role: profileData.role,
         membership_tier: profileData.membershipTier,
+        email: profileData.email,
+        password: profileData.password,
+        linked: profileData.linked,
+        links: profileData.links,
+        short_id: generateShortId(), // Utility function to generate short IDs
       };
   
       console.log("Payload being sent to Supabase:", payload); // Log the payload to verify data

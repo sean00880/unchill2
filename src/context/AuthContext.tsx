@@ -8,6 +8,7 @@ import { WagmiProvider } from "wagmi";
 import { createAppKit } from "@reown/appkit";
 import { mainnet, base, bsc } from "@reown/appkit/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
+import { supabase } from "../utils/supaBaseClient";
 
 // Initialize AppKit
 export const appKit = createAppKit({
@@ -15,35 +16,44 @@ export const appKit = createAppKit({
   projectId,
   networks: [mainnet, base, bsc],
   defaultNetwork: mainnet,
-  features: {
-    analytics: true,
-    email: true,
-    socials: ["google", "x", "discord"],
-  },
 });
 
-// Create a QueryClient instance
 const queryClient = new QueryClient();
 
-interface Profile {
+// Add `Profile` export in AuthContext.tsx
+
+export interface Profile {
+  id: string;
   displayName: string;
   username: string;
-  profileImage: string | null;
+  about: string;
+  profileImageUrl: string | null;
+  bannerImageUrl: string | null;
+  membershipTier: string;
+  profileType: string;
+  role: string;
+  walletAddress: string;
+  accountIdentifier: string;
+  email?: string; // Optional
+  password?: string; // Optional
+  shortId?: string; // Optional
+  linked?: string[]; // Optional
+  links?: string[]; // Optional
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   walletAddress: string | null;
   accountIdentifier: string | null;
-  profiles: Record<string, Profile>;
-  walletProfiles: Record<string, Profile>;
+  profiles: Profile[];
   activeWallet: string | null;
-  profileImage: string | null;
   activeProfile: Profile | null;
   setActiveWallet: (walletAddress: string) => void;
   connect: (connector: Connector) => Promise<void>;
   disconnect: () => Promise<void>;
   connectors: readonly Connector[];
+  fetchProfiles: (accountIdentifier: string) => Promise<void>; // Add fetchProfiles
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -58,111 +68,113 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [accountIdentifier, setAccountIdentifier] = useState<string | null>(null);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  
 
-  // Alias for compatibility
-  const walletProfiles = profiles;
+  // Fetch profiles for the accountIdentifier
+  const fetchProfiles = async (identifier: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, display_name, username, about, profile_image_url, banner_image_url, membership_tier, profile_type, role, wallet_address, account_identifier, email, password, short_id, linked, links"
+      )
+      .eq("account_identifier", identifier);
+  
+    if (!error && data) {
+      const formattedData: Profile[] = data.map((profile) => ({
+        id: profile.id,
+        displayName: profile.display_name,
+        username: profile.username,
+        about: profile.about,
+        profileImageUrl: profile.profile_image_url,
+        bannerImageUrl: profile.banner_image_url,
+        membershipTier: profile.membership_tier,
+        profileType: profile.profile_type,
+        role: profile.role,
+        walletAddress: profile.wallet_address,
+        accountIdentifier: profile.account_identifier,
+        email: profile.email,
+        password: profile.password,
+        shortId: profile.short_id,
+        linked: profile.linked,
+        links: profile.links,
+      }));
+  
+      setProfiles(formattedData);
+    } else {
+      console.error("Error fetching profiles:", error);
+      setProfiles([]);
+    }
+  };
+  
 
-  // Automatically synchronize wallet connection
+  // Automatically sync wallet connection
   useEffect(() => {
     if (isConnected && address) {
       setWalletAddress(address);
     }
   }, [isConnected, address]);
 
-  // Set accountIdentifier and update active wallet/profile when connected
+  // Fetch profiles and set active profile when accountIdentifier changes
   useEffect(() => {
     if (isConnected && caipAddress) {
       setAccountIdentifier(caipAddress);
-
-      // Load or initialize profiles from localStorage or API
-      const storedProfiles = JSON.parse(localStorage.getItem("profiles") || "{}");
-      setProfiles(storedProfiles);
-
-      // Set the active profile and image based on the active wallet
-      if (address && storedProfiles[address]) {
-        setActiveWallet(address);
-        setActiveProfile(storedProfiles[address]);
-        setProfileImage(storedProfiles[address].profileImage);
-      }
+      fetchProfiles(caipAddress);
     }
-  }, [isConnected, caipAddress, address]);
-
-  // Save profiles to localStorage whenever updated
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("profiles", JSON.stringify(profiles));
-    }
-  }, [profiles]);
-
-  // Wallet connect logic
-const handleConnect = async (connector: Connector): Promise<void> => {
-  try {
-    await connect({ connector });
-
-    // Ensure the connector supports `getAddress` and explicitly cast its type
-    if ('getAddress' in connector && typeof connector.getAddress === 'function') {
-      const newAddress = await connector.getAddress() as string;
-      setWalletAddress(newAddress);
-    } else {
-      throw new Error("Connector does not support getAddress method.");
-    }
-  } catch (error) {
-    console.error("Wallet connection failed:", error);
-    alert("Wallet connection failed. Please try again.");
-  }
-};
-
-
-  
-
-  // Wallet disconnect logic
-  const handleDisconnect = async (): Promise<void> => {
-    setWalletAddress(null);
-    setAccountIdentifier(null);
-    setActiveWallet(null);
-    setActiveProfile(null);
-    setProfileImage(null);
-    try {
-      await wagmiDisconnect();
-      await appKit.adapter?.connectionControllerClient?.disconnect();
-    } catch (error) {
-      console.error("Wallet disconnect error:", error);
-    }
-  };
+  }, [isConnected, caipAddress]);
 
   // Set the active wallet and its corresponding profile
   const handleSetActiveWallet = (wallet: string) => {
     setActiveWallet(wallet);
-    if (profiles[wallet]) {
-      setActiveProfile(profiles[wallet]);
-      setProfileImage(profiles[wallet].profileImage);
-    } else {
-      setActiveProfile(null);
-      setProfileImage(null);
+    const profile = profiles.find((p) => p.walletAddress === wallet);
+    setActiveProfile(profile || null);
+  };
+
+  // Wallet connection logic
+  const handleConnect = async (connector: Connector & { getAddress?: () => Promise<string> }) => {
+    try {
+      await connect({ connector });
+  
+      if (connector.getAddress) {
+        const newAddress = await connector.getAddress();
+        setWalletAddress(newAddress);
+      } else {
+        console.warn("Connector does not support getAddress.");
+      }
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
     }
+  };
+  
+
+  // Wallet disconnection logic
+  const handleDisconnect = async () => {
+    setWalletAddress(null);
+    setAccountIdentifier(null);
+    setActiveWallet(null);
+    setActiveProfile(null);
+    setProfiles([]);
+    await wagmiDisconnect();
   };
 
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <AuthContext.Provider
-          value={{
-            walletAddress,
-            accountIdentifier,
-            profiles,
-            walletProfiles,
-            activeWallet,
-            profileImage,
-            activeProfile,
-            setActiveWallet: handleSetActiveWallet,
-            connect: handleConnect,
-            disconnect: handleDisconnect,
-            connectors,
-          }}
+        value={{
+          walletAddress,
+          accountIdentifier,
+          profiles,
+          activeWallet,
+          activeProfile,
+          setActiveWallet: handleSetActiveWallet,
+          connect: handleConnect,
+          disconnect: handleDisconnect,
+          connectors,
+          fetchProfiles, // Provide fetchProfiles
+        }}
         >
           {children}
         </AuthContext.Provider>
