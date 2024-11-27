@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SidebarAd from "../../components/SideBarAd";
 import Post from "../../components/Post";
 import TrendingBar from "../../components/TrendingBar";
 import GetLinked from "../../components/GetLinked";
 import CreatePost from "../../components/CreatePost";
 import { supabase } from "../../utils/supaBaseClient";
+import { useAuthContext } from "../../context/AuthContext";
 
 interface PostData {
   id: string;
@@ -22,43 +23,38 @@ interface PostData {
 }
 
 export default function FeedPage() {
+  const { activeProfile } = useAuthContext();
   const [posts, setPosts] = useState<PostData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch posts from the database
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("timestamp", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching posts:", error.message);
-        return;
-      }
-
-      setPosts(data || []);
-    };
-
-    fetchPosts();
-  }, []);
-
-  // Callback to handle new post creation
-  const handlePostCreated = async () => {
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .order("timestamp", { ascending: false })
-      .limit(1);
-
-    if (error) {
-      console.error("Error fetching new post:", error.message);
+  const fetchPosts = useCallback(async () => {
+    if (!activeProfile?.id) {
+      setPosts([]);
+      setLoading(false);
       return;
     }
 
-    if (data && data.length > 0) {
-      setPosts((prev) => [data[0], ...prev]);
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("profile_id", activeProfile.id)
+      .order("timestamp", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching posts:", error.message);
+      setPosts([]);
+    } else {
+      setPosts(data || []);
     }
+    setLoading(false);
+  }, [activeProfile?.id]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handlePostCreated = async () => {
+    fetchPosts(); // Refetch posts after creating a new one
   };
 
   return (
@@ -78,9 +74,13 @@ export default function FeedPage() {
             <CreatePost onPostCreated={handlePostCreated} />
 
             {/* Posts Feed */}
-            {posts.map((post) => (
-              <Post key={post.id} post={post} isDarkMode={true} />
-            ))}
+            {loading ? (
+              <div className="text-center text-gray-400">Loading posts...</div>
+            ) : posts.length > 0 ? (
+              posts.map((post) => <Post key={post.id} post={post} isDarkMode={true} />)
+            ) : (
+              <div className="text-center text-gray-400">No posts available.</div>
+            )}
           </div>
 
           {/* Right Section with GetLinked and Explore Links (4 columns) */}

@@ -21,7 +21,6 @@ export const appKit = createAppKit({
 const queryClient = new QueryClient();
 
 // Add `Profile` export in AuthContext.tsx
-
 export interface Profile {
   id: string;
   displayName: string;
@@ -42,6 +41,7 @@ export interface Profile {
 }
 
 export interface AuthContextType {
+  username: string | null;
   walletAddress: string | null;
   accountIdentifier: string | null;
   profiles: Profile[];
@@ -54,24 +54,25 @@ export interface AuthContextType {
   fetchProfiles: (accountIdentifier: string) => Promise<void>; // Add fetchProfiles
 }
 
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
   children: ReactNode;
+  cookies?: string | null;
 };
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress } = useAppKitAccount();
 
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(null);
+  // Initialize states with cookies fallback
+  const [username, setUsername] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string | null>(cookies || null); // Use cookies as initial state
+  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(cookies || null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  
 
   // Fetch profiles for the accountIdentifier
   const fetchProfiles = async (identifier: string) => {
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         "id, display_name, username, about, profile_image_url, banner_image_url, membership_tier, profile_type, role, wallet_address, account_identifier, email, password, short_id, linked, links"
       )
       .eq("account_identifier", identifier);
-  
+
     if (!error && data) {
       const formattedData: Profile[] = data.map((profile) => ({
         id: profile.id,
@@ -101,14 +102,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         linked: profile.linked,
         links: profile.links,
       }));
-  
       setProfiles(formattedData);
+
+      // Set the username if profiles are available
+      if (formattedData.length > 0) {
+        setUsername(formattedData[0].username);
+      } else {
+        setUsername(null);
+      }
     } else {
       console.error("Error fetching profiles:", error);
       setProfiles([]);
+      setUsername(null);
     }
   };
-  
 
   // Automatically sync wallet connection
   useEffect(() => {
@@ -116,6 +123,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setWalletAddress(address);
     }
   }, [isConnected, address]);
+
+  // Use cookies to fetch profiles if available
+  useEffect(() => {
+    if (cookies && !isConnected) {
+      console.log("Using cookies for initial setup:", cookies);
+      setAccountIdentifier(cookies);
+      fetchProfiles(cookies);
+    }
+  }, [cookies, isConnected]);
 
   // Fetch profiles and set active profile when accountIdentifier changes
   useEffect(() => {
@@ -136,7 +152,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const handleConnect = async (connector: Connector & { getAddress?: () => Promise<string> }) => {
     try {
       await connect({ connector });
-  
+
       if (connector.getAddress) {
         const newAddress = await connector.getAddress();
         setWalletAddress(newAddress);
@@ -147,7 +163,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error("Wallet connection failed:", error);
     }
   };
-  
 
   // Wallet disconnection logic
   const handleDisconnect = async () => {
@@ -163,18 +178,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <AuthContext.Provider
-        value={{
-          walletAddress,
-          accountIdentifier,
-          profiles,
-          activeWallet,
-          activeProfile,
-          setActiveWallet: handleSetActiveWallet,
-          connect: handleConnect,
-          disconnect: handleDisconnect,
-          connectors,
-          fetchProfiles, // Provide fetchProfiles
-        }}
+          value={{
+            walletAddress,
+            accountIdentifier,
+            profiles,
+            activeWallet,
+            activeProfile,
+            setActiveWallet: handleSetActiveWallet,
+            connect: handleConnect,
+            disconnect: handleDisconnect,
+            connectors,
+            username, // Add this line
+            fetchProfiles, // Provide fetchProfiles
+          }}
         >
           {children}
         </AuthContext.Provider>

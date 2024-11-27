@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import { supabase } from "src/utils/supaBaseClient";
 
 interface Comment {
   id: string;
@@ -33,7 +34,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
   // Determine if the user is verified based on membership_tier
   const isVerified = comment.membership_tier === "verified";
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (userReaction === "like") {
       setLikeCount(likeCount - 1);
       setUserReaction(null);
@@ -42,9 +43,10 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
       if (userReaction === "dislike") setDislikeCount(dislikeCount - 1);
       setUserReaction("like");
     }
+    await updateReaction("like");
   };
 
-  const handleDislike = () => {
+  const handleDislike = async () => {
     if (userReaction === "dislike") {
       setDislikeCount(dislikeCount - 1);
       setUserReaction(null);
@@ -53,14 +55,30 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
       if (userReaction === "like") setLikeCount(likeCount - 1);
       setUserReaction("dislike");
     }
+    await updateReaction("dislike");
   };
 
-  const handleBoost = () => {
+  const handleBoost = async () => {
     setBoostCount(boostCount + 1);
+    await updateReaction("boost");
   };
 
-  const handleReshare = () => {
+  const handleReshare = async () => {
     setReshareCount(reshareCount + 1);
+    await updateReaction("reshare");
+  };
+
+  const updateReaction = async (type: string) => {
+    const updatedFields: Record<string, number> = {
+      like: likeCount,
+      dislike: dislikeCount,
+      boost: boostCount,
+      reshare: reshareCount,
+    };
+    await supabase
+      .from("replies")
+      .update({ [type]: updatedFields[type] })
+      .eq("id", comment.id);
   };
 
   return (

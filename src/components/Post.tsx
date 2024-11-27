@@ -7,6 +7,7 @@ import { supabase } from "../utils/supaBaseClient";
 import Comment from "./Comment";
 import { useAuthContext } from "../context/AuthContext";
 
+
 interface Profile {
   id: string;
   display_name: string;
@@ -50,7 +51,6 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
-  const { accountIdentifier, username } = useAuthContext();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [likes, setLikes] = useState(post.likes);
@@ -60,10 +60,11 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
   const [userReaction, setUserReaction] = useState<null | "like" | "dislike">(null);
   const [isCommentsVisible, setIsCommentsVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const { accountIdentifier, activeProfile } = useAuthContext();
   const [currentImageIndex, setCurrentImageIndex] = useState<number | null>(null); // Modal state for image
   const router = useRouter();
 
+  // Fetch profile associated with the post
   useEffect(() => {
     const fetchProfile = async () => {
       const { data, error } = await supabase
@@ -92,15 +93,17 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
     fetchProfile();
   }, [post.profile_id]);
 
+  // Fetch comments for the post
   useEffect(() => {
-    if (isCommentsVisible) {
+    if (isCommentsVisible && activeProfile) {
       const fetchComments = async () => {
         const { data, error } = await supabase
           .from("replies")
           .select(
             "id, profile_id, post_id, content, media, timestamp, likes, dislikes, boosts, reshares, comments_count, username, profile_image_url, membership_tier"
           )
-          .eq("post_id", post.id);
+          .eq("post_id", post.id)
+          .eq("profile_id", activeProfile.id); // Filter by activeProfile ID
 
         if (error) {
           console.error("Error fetching comments:", error.message);
@@ -112,7 +115,7 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
 
       fetchComments();
     }
-  }, [isCommentsVisible, post.id]);
+  }, [isCommentsVisible, post.id, activeProfile]);
 
   const openImageModal = (index: number) => {
     setCurrentImageIndex(index);
@@ -138,8 +141,26 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
 
   const toggleCommentsVisibility = () => setIsCommentsVisible(!isCommentsVisible);
 
-  const handleReaction = async (type: "like" | "dislike") => {
+  const handleBoost = async () => {
     if (!accountIdentifier) {
+      alert("You need to be logged in to boost posts.");
+      return;
+    }
+    setBoosts(boosts + 1);
+    await supabase.from("posts").update({ boosts: boosts + 1 }).eq("id", post.id);
+  };
+
+  const handleReshare = async () => {
+    if (!accountIdentifier) {
+      alert("You need to be logged in to reshare posts.");
+      return;
+    }
+    setReshares(reshares + 1);
+    await supabase.from("posts").update({ reshares: reshares + 1 }).eq("id", post.id);
+  };
+
+  const handleReaction = async (type: "like" | "dislike") => {
+    if (!activeProfile) {
       alert("You need to be logged in to interact with posts.");
       return;
     }
@@ -179,24 +200,6 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
     await supabase.from("posts").update(updatedReactions).eq("id", post.id);
   };
 
-  const handleBoost = async () => {
-    if (!accountIdentifier) {
-      alert("You need to be logged in to boost posts.");
-      return;
-    }
-    setBoosts(boosts + 1);
-    await supabase.from("posts").update({ boosts: boosts + 1 }).eq("id", post.id);
-  };
-
-  const handleReshare = async () => {
-    if (!accountIdentifier) {
-      alert("You need to be logged in to reshare posts.");
-      return;
-    }
-    setReshares(reshares + 1);
-    await supabase.from("posts").update({ reshares: reshares + 1 }).eq("id", post.id);
-  };
-
   const renderMedia = () => {
     if (!post.media || post.media.length === 0) return null;
 
@@ -210,6 +213,7 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
       </div>
     );
   };
+
   return (
     <>
       <div
@@ -238,17 +242,24 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
                 <p className="text-sm">{profile.links} Followers</p>
               </div>
             </div>
-            {profile.username === username && (
+            {profile?.id === activeProfile?.id && (
+            <div className="relative">
               <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)}>
                 ⋮
               </button>
-            )}
-            {menuOpen && (
-              <div className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-lg shadow-lg">
-                <button className="block w-full text-left px-4 py-2">Edit</button>
-                <button className="block w-full text-left px-4 py-2">Delete</button>
-              </div>
-            )}
+              {menuOpen && (
+                <div className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-lg shadow-lg">
+                  <button className="block w-full text-left px-4 py-2" onClick={() => {/* Handle Edit */}}>
+                    Edit
+                  </button>
+                  <button className="block w-full text-left px-4 py-2" onClick={() => {/* Handle Delete */}}>
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           </div>
         )}
         <p className="text-base mb-3">{post.content}</p>
@@ -279,7 +290,6 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
         )}
       </div>
 
-      {/* Full-Screen Modal */}
       {currentImageIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
           <button className="absolute top-4 left-4 text-white text-2xl" onClick={closeImageModal}>
@@ -300,12 +310,6 @@ const Post: React.FC<PostProps> = ({ post, isDarkMode }) => {
           <button className="absolute right-4 text-white text-2xl" onClick={() => navigateImage("next")}>
             ▶
           </button>
-          <div className="absolute top-4 right-4 bg-white p-4 rounded-lg">
-            <h3 className="text-lg font-bold">Comments</h3>
-            {comments.map((comment) => (
-              <Comment key={comment.id} comment={comment} />
-            ))}
-          </div>
         </div>
       )}
     </>
