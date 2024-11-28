@@ -3,40 +3,34 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuthContext } from "../../../context/AuthContext";
-import { Connector } from "wagmi";
 
 export default function ConnectPage() {
   const {
     walletAddress,
-    activeWallet,
+    blockchainWallet, // Added to display legacy accountIdentifier if needed
     activeProfile,
     accountIdentifier,
     profiles,
-    connectors,
-    connect,
-    setActiveWallet,
+    switchProfile,
     fetchProfiles,
   } = useAuthContext();
 
-  // Automatically fetch profiles after wallet connection
+  // Debugging logs for current state
+  useEffect(() => {
+    console.log("Current Wallet Address:", walletAddress);
+    console.log("Current Account Identifier (Chain ID):", accountIdentifier);
+    console.log("Current Blockchain Wallet (Chain ID + Address):", blockchainWallet);
+    console.log("Current Profiles:", profiles);
+    console.log("Active Profile:", activeProfile);
+  }, [walletAddress, accountIdentifier, blockchainWallet, profiles, activeProfile]);
+
+  // Automatically fetch profiles when accountIdentifier changes
   useEffect(() => {
     if (accountIdentifier) {
+      console.log("Fetching profiles for Account Identifier:", accountIdentifier);
       fetchProfiles(accountIdentifier);
     }
   }, [accountIdentifier, fetchProfiles]);
-
-  const handleConnectWallet = async (connector: Connector) => {
-    try {
-      await connect(connector);
-
-      // Optionally, set the first wallet as active if none is set
-      if (!activeWallet && walletAddress) {
-        setActiveWallet(walletAddress);
-      }
-    } catch (error) {
-      console.error("Error connecting wallet:", error);
-    }
-  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -51,16 +45,8 @@ export default function ConnectPage() {
 
       {/* Wallet Connect Buttons */}
       <div className="mt-8 flex flex-col space-y-4">
-        {connectors.map((connector) => (
-          <button
-            key={connector.id}
-            onClick={() => handleConnectWallet(connector)}
-            className="p-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-            disabled={!connector.ready}
-          >
-            {connector.name} {connector.ready ? "" : "(Unavailable)"}
-          </button>
-        ))}
+        {/* Wallet Connect Component */}
+        <w3m-button />
       </div>
 
       {/* Status of Current Connection */}
@@ -72,32 +58,36 @@ export default function ConnectPage() {
           className="mt-8 bg-gray-100 p-4 rounded-md shadow-lg"
         >
           <h3 className="text-lg font-medium">Wallet Connected</h3>
-          <p className="text-sm">Address: {walletAddress}</p>
+          <p className="text-sm">Wallet Address: {walletAddress}</p>
+          <p className="text-sm">Chain ID (Account Identifier): {accountIdentifier}</p>
+          <p className="text-sm">Legacy Blockchain Wallet: {blockchainWallet}</p>
 
-          {/* Show Profiles */}
+          {/* Show Linked Profiles */}
           {profiles.length > 0 ? (
             <div className="mt-4">
               <h4 className="text-md font-medium">Linked Profiles:</h4>
               <ul className="mt-2 space-y-2">
-                {profiles.map((profile) => (
-                  <li
-                    key={profile.id}
-                    className={`p-2 border rounded-md ${
-                      activeProfile?.walletAddress === profile.walletAddress
-                        ? "border-blue-500 bg-blue-100"
-                        : "border-gray-300"
-                    }`}
-                    onClick={() => setActiveWallet(profile.walletAddress)}
-                  >
-                    <p className="font-medium">
-                      {profile.displayName || profile.username}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Wallet: {profile.walletAddress}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+  {profiles.map((profile) => (
+    <li
+      key={profile.id}
+      className={`p-2 border rounded-md cursor-pointer ${
+        activeProfile?.walletAddress === profile.walletAddress
+          ? "border-blue-500 bg-blue-100"
+          : "border-gray-300"
+      }`}
+      onClick={() => {
+        console.log("Switching to Wallet Profile:", profile.walletAddress);
+        switchProfile(profile.walletAddress); // Use switchProfile
+      }}
+    >
+      <p className="font-medium">
+        {profile.displayName || profile.username || "Unnamed Profile"}
+      </p>
+      <p className="text-sm text-gray-500">Wallet: {profile.walletAddress}</p>
+    </li>
+  ))}
+</ul>
+
             </div>
           ) : (
             <p className="mt-4 text-sm text-gray-500">

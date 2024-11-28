@@ -309,23 +309,23 @@ const HomePage: React.FC = () => {
               <div>
   <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Comprehensive Documentation</h3>
   <p className="mb-4 text-white">
-    Access all the essential information, guides, and technical details you need to make the most out of MemeLinked's platform. From onboarding to advanced features, we have everything covered.
+    Access all the essential information, guides, and technical details you need to make the most out of MemeLinked&apos;s platform. From onboarding to advanced features, we have everything covered.
   </p>
   <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
     <div className="p-4 bg-gray-100 rounded-lg shadow-md">
       <h4 className="text-xl font-bold mb-2">MemeLinked Platform Overview</h4>
       <p className="text-gray-700">Explore the core features and benefits of using MemeLinked.</p>
-      <a href="/docs/platform-overview" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</a>
+      <Link href="/docs/platform-overview" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</Link>
     </div>
     <div className="p-4 bg-gray-100 rounded-lg shadow-md">
       <h4 className="text-xl font-bold mb-2">How to Navigate the MemeLinked dApp</h4>
       <p className="text-gray-700">Learn how to effectively navigate and utilize the features of the dApp.</p>
-      <a href="/docs/navigate-dapp" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</a>
+      <Link href="/docs/navigate-dapp" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</Link>
     </div>
     <div className="p-4 bg-gray-100 rounded-lg shadow-md">
       <h4 className="text-xl font-bold mb-2">Security and Best Practices in MemeLinked</h4>
       <p className="text-gray-700">Understand the best practices to keep your interactions secure.</p>
-      <a href="/docs/security-best-practices" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</a>
+      <Link href="/docs/security-best-practices" className="text-yellow-500 hover:text-yellow-400 mt-2 inline-block transition">Read more →</Link>
     </div>
   </div>
 </div>

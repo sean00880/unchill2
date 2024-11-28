@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { supabase } from "src/utils/supaBaseClient";
 import { useAuthContext } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -25,43 +24,32 @@ export const useAuthRedirect = () => {
       }
 
       try {
-        // Fetch profiles from Supabase
-        const { data: fetchedProfiles, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("account_identifier", accountIdentifier);
-
-        if (error) {
-          console.error("Error fetching profiles from Supabase:", error);
-          router.replace("/auth/connect"); // Safe fallback
-          return;
-        }
-
-        // Ensure fetchedProfiles is not null and is an array
-        const profilesArray = fetchedProfiles || [];
-
-        // Dynamically fetch profiles using fetchProfiles if not already loaded
-        if (profilesArray.length === 0 && accountIdentifier) {
+        // Ensure profiles are loaded by fetching them if not already available
+        if (profiles.length === 0 && accountIdentifier) {
+          console.log("Profiles not loaded, fetching using fetchProfiles...");
           await fetchProfiles(accountIdentifier);
         }
 
         // Check if the connected wallet has a linked profile
-        const linkedProfile = profilesArray.find(
+        const linkedProfile = profiles.find(
           (profile) => profile.walletAddress === walletAddress
         );
 
         if (!linkedProfile) {
+          console.log("No linked profile found for wallet, redirecting to create-profile...");
           // Redirect to create-profile if no profile exists for the connected wallet
           router.replace("/auth/create-profile");
           return;
         }
 
         // Set the active wallet and redirect to overview if a profile exists
+        console.log("Linked profile found, setting active wallet and redirecting to overview...");
         setActiveWallet(walletAddress);
         router.replace("/auth/overview");
       } catch (error) {
         console.error("Error during authentication redirect:", error);
-        router.replace("/auth/connect"); // Safe fallback
+        // Redirect to connect as a fallback
+        router.replace("/auth/connect");
       }
     };
 

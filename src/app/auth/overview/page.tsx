@@ -9,9 +9,10 @@ export default function ProfileOverviewPage() {
   const {
     activeProfile,
     activeWallet,
+    blockchainWallet, // Include blockchainWallet for additional context
     disconnect,
     profiles,
-    setActiveWallet,
+    switchProfile, // Use switchProfile directly
   } = useAuthContext();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -19,8 +20,10 @@ export default function ProfileOverviewPage() {
   // Redirect if no wallet is connected or no active profile is set
   useEffect(() => {
     if (!activeWallet) {
+      console.log("No active wallet, redirecting to connect page...");
       router.push("/auth/connect");
     } else if (!activeProfile) {
+      console.log("No active profile, redirecting to create-profile page...");
       router.push("/auth/create-profile");
     }
   }, [activeWallet, activeProfile, router]);
@@ -33,8 +36,8 @@ export default function ProfileOverviewPage() {
   };
 
   const handleSwitchProfile = (walletAddress: string) => {
-    setActiveWallet(walletAddress);
-    window.location.reload(); // Reload to reflect the profile change
+    console.log("Switching profile to wallet:", walletAddress);
+    switchProfile(walletAddress); // Directly call switchProfile
   };
 
   if (!activeProfile || !activeWallet) {
@@ -90,6 +93,9 @@ export default function ProfileOverviewPage() {
           <p>
             <strong>Profile Type:</strong> {activeProfile.profileType}
           </p>
+          <p>
+            <strong>Blockchain Wallet:</strong> {blockchainWallet}
+          </p>
         </div>
 
         {/* Switch Profile Dropdown */}
@@ -102,7 +108,7 @@ export default function ProfileOverviewPage() {
           >
             {profiles.map((profile) => (
               <option key={profile.walletAddress} value={profile.walletAddress}>
-                {profile.displayName || profile.username}
+                {profile.displayName || profile.username || "Unnamed Profile"}
               </option>
             ))}
           </select>

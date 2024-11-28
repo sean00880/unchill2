@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import { Provider } from 'urql';
 import { client } from '../lib/urql';
@@ -12,6 +13,7 @@ import { AuthProvider } from '../context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { config } from '../lib/config';
+import { ReactNode } from "react";
 
 // Define local fonts
 const geistSans = localFont({
@@ -36,9 +38,10 @@ const posts = [
   { title: 'The Future of Meme-Driven Finance', href: '/blog/meme-finance-future' },
 ];
 
+// RootLayoutProps Interface
 interface RootLayoutProps {
-  children: React.ReactNode;
-  cookies: string | null;
+  children: ReactNode;
+  cookies: { walletAddress?: string | null; accountIdentifier?: string | null } | null; // Correct type
 }
 
 export default function RootLayout({ children, cookies }: RootLayoutProps) {
@@ -47,11 +50,21 @@ export default function RootLayout({ children, cookies }: RootLayoutProps) {
   const isDocumentationPage = pathname.startsWith('/docs');
   const isBlogPage = pathname.startsWith('/blog');
 
+  // Extract cookies with fallback for undefined/null
+  const parsedCookies = {
+    walletAddress: cookies?.walletAddress || null,
+    accountIdentifier: cookies?.accountIdentifier || null,
+  };
+
+  // Log cookies to verify they are being read
+  console.log('Cookies:', parsedCookies);
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <Provider value={client}>
-          <AuthProvider>
+          {/* Pass cookies to AuthProvider */}
+          <AuthProvider cookies={parsedCookies}>
             <html lang="en">
               <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
                 {isLandingPage ? (

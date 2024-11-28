@@ -1,20 +1,22 @@
-"use client"; // Ensure client-side execution
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../context/AuthContext";
 
 export default function AuthPage() {
-  const { accountIdentifier } = useAuthContext();
+  const { walletAddress, accountIdentifier, activeProfile } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {
-    if (!accountIdentifier) {
-      router.push("/auth/connect");
+    if (!walletAddress) {
+      router.replace("/auth/connect"); // Redirect to wallet connect if no wallet
+    } else if (!activeProfile) {
+      router.replace("/auth/create-profile"); // Redirect to profile creation if no profile
     } else {
-      router.push("/auth/overview");
+      router.replace("/auth/overview"); // Redirect to overview if wallet and profile are set
     }
-  }, [accountIdentifier, router]);
+  }, [walletAddress, activeProfile, router]);
 
   return (
     <div className="text-center text-white min-h-screen flex items-center justify-center">

@@ -3,36 +3,40 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Connector } from "wagmi";
-import { Profile } from "@context/AuthContext";
+import { useAuthContext, Profile } from "../context/AuthContext";
+
+interface TopBarProps {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+  connect: (connector: Connector) => Promise<void>;
+  connectors: readonly Connector[];
+  disconnect: () => Promise<void>;
+  walletAddress: string | null;
+  profiles: Profile[];
+  activeProfile: Profile | null;
+}
 
 export default function TopBar({
   isDarkMode,
   toggleTheme,
-  walletAddress,
-  activeProfile,
-  profiles,
   connect,
-  disconnect,
   connectors,
-  setActiveWallet,
-}: {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
-  walletAddress: string | null;
-  activeProfile: Profile | null;
-  profiles: Profile[];
-  connect: (connector: Connector) => Promise<void>;
-  disconnect: () => Promise<void>;
-  connectors: readonly Connector[];
-  setActiveWallet: (walletAddress: string) => void;
-}) {
+  disconnect,
+  walletAddress,
+  profiles,
+  activeProfile,
+}: TopBarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Compute profile image
-  const profileImage = activeProfile?.profileImageUrl || "/images/default_logo.jpg";
+  // Get switchProfile from AuthContext
+  const { switchProfile } = useAuthContext();
 
+  // Compute profile image
+  const profileImage =
+    activeProfile?.profileImageUrl || "/images/default_logo.jpg";
+
+  // Handle profile menu hover
   const handleProfileHover = () => setIsMenuOpen(true);
   const handleProfileLeave = () => setIsMenuOpen(false);
 
@@ -46,19 +50,6 @@ export default function TopBar({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const handleConnect = async () => {
-    if (connectors.length > 0 && !isConnecting) {
-      try {
-        setIsConnecting(true);
-        await connect(connectors[0]);
-      } catch (error) {
-        console.error("Wallet connection failed:", error);
-      } finally {
-        setIsConnecting(false);
-      }
-    }
-  };
 
   return (
     <div className="topbar flex items-center justify-between px-4 py-2 shadow-lg border-b border-gray-700">
@@ -95,7 +86,7 @@ export default function TopBar({
             onMouseLeave={handleProfileLeave}
             ref={menuRef}
           >
-            {/* Active Profile */}
+            {/* Profile Image */}
             <Image
               src={profileImage}
               alt="Profile Image"
@@ -103,6 +94,8 @@ export default function TopBar({
               height={40}
               className="rounded-full cursor-pointer"
             />
+
+            {/* Dropdown Menu */}
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-10">
                 <ul className="py-2">
@@ -110,15 +103,18 @@ export default function TopBar({
                     <li
                       key={profile.walletAddress}
                       className={`px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
-                        activeProfile?.walletAddress === profile.walletAddress ? "font-bold" : ""
+                        activeProfile?.walletAddress ===
+                        profile.walletAddress
+                          ? "font-bold"
+                          : ""
                       }`}
-                      onClick={() => setActiveWallet(profile.walletAddress)}
+                      onClick={() => switchProfile(profile.walletAddress)}
                     >
                       {profile.displayName || profile.username}
                     </li>
                   ))}
                   <li
-                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer text-red-500"
+                    className="px-4 py-2 text-sm text-red-500 hover:bg-gray-100 cursor-pointer"
                     onClick={disconnect}
                   >
                     Logout
@@ -128,12 +124,33 @@ export default function TopBar({
             )}
           </div>
         ) : (
-          <button
-            onClick={handleConnect}
-            className="p-2 rounded-md border bg-blue-500 text-white hover:bg-blue-600 transition"
-          >
-            Connect Wallet
-          </button>
+          // Wallet Connectors Dropdown
+          <div className="relative">
+            <button
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+              className="p-2 rounded-md border bg-white text-black"
+            >
+              Connect Wallet
+            </button>
+            {isMenuOpen && (
+              <div
+                className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-10"
+                ref={menuRef}
+              >
+                <ul className="py-2">
+                  {connectors.map((connector) => (
+                    <li
+                      key={connector.id}
+                      className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                      onClick={() => connect(connector)}
+                    >
+                      {connector.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
