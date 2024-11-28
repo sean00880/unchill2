@@ -78,7 +78,7 @@ export default function TopBar({
         >
           {isDarkMode ? "☀️" : "🌙"}
         </button>
-
+          <w3m-button/>
         {walletAddress ? (
           <div
             className="relative"
