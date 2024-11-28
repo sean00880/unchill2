@@ -9,8 +9,8 @@ import { createAppKit } from "@reown/appkit";
 import { mainnet, base, bsc } from "@reown/appkit/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { supabase } from "../utils/supaBaseClient";
+import Cookies from "js-cookie";
 
-// Initialize AppKit
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
@@ -32,8 +32,8 @@ export interface Profile {
   profileType: string;
   role: string;
   walletAddress: string;
-  accountIdentifier: string; // Updated to store only chainId
-  blockchainWallet: string; // New field: chainId + walletAddress
+  accountIdentifier: string;
+  blockchainWallet: string;
   email?: string;
   password?: string;
   shortId?: string;
@@ -46,12 +46,12 @@ export interface AuthContextType {
   username: string | null;
   walletAddress: string | null;
   accountIdentifier: string | null;
-  blockchainWallet: string | null; // New state for legacy data
+  blockchainWallet: string | null;
   profiles: Profile[];
   activeWallet: string | null;
-  activeProfile: Profile | null; 
-  setActiveWallet: (walletAddress: string) => void; // Internal use
-  switchProfile: (walletAddress: string) => void; // User-facing function
+  activeProfile: Profile | null;
+  setActiveWallet: (walletAddress: string) => void;
+  switchProfile: (walletAddress: string) => void;
   connect: (connector: Connector) => Promise<void>;
   disconnect: () => Promise<void>;
   connectors: readonly Connector[];
@@ -65,65 +65,67 @@ type AuthProviderProps = {
   cookies?: { walletAddress: string | null; accountIdentifier: string | null };
 };
 
+// Helper function for cookie validation
+const validateCookie = (key: string, value: string | null | undefined, prefix: string): string | null => {
+  if (value && value.startsWith(prefix)) {
+    return value;
+  }
+  console.warn(`Invalid cookie for key "${key}":`, value);
+  return null;
+};
+
+
 export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress, status } = useAppKitAccount();
 
+  // Use cookies for initial state
+  const [walletAddress, setWalletAddress] = useState<string | null>(
+    validateCookie("walletAddress", cookies?.walletAddress ?? null, "0x")
+  );
+  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(
+    validateCookie("accountIdentifier", cookies?.accountIdentifier ?? null, "user-")
+  );
+  
+
+  // Remaining state variables remain unchanged
   const [username, setUsername] = useState<string | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(cookies?.walletAddress || null);
-  const [accountIdentifier, setAccountIdentifier] = useState<string | null>(cookies?.accountIdentifier || null);
-  const [blockchainWallet, setBlockchainWallet] = useState<string | null>(null); // New state
+  const [blockchainWallet, setBlockchainWallet] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
 
-  // Profile Cache to Avoid Redundant API Calls
   const profileCache = useRef<Map<string, Profile[]>>(new Map());
 
-  
+  const generateAccountIdentifier = () => `user-${crypto.randomUUID()}`;
+
   const switchProfile = (wallet: string) => {
     if (!profiles.some((p) => p.walletAddress === wallet)) {
       console.error("Cannot switch to a non-existent profile:", wallet);
       return;
     }
-    console.log("Switching profile to wallet:", wallet);
     setActiveWallet(wallet);
+    setActiveProfile(profiles.find((p) => p.walletAddress === wallet) || null);
   };
-  
 
-  // Log State Changes
-  useEffect(() => {
-    console.log("AuthProvider State Updated:", {
-      username,
-      walletAddress,
-      accountIdentifier,
-      blockchainWallet,
-      profiles,
-      activeWallet,
-      activeProfile,
-    });
-  }, [username, walletAddress, accountIdentifier, blockchainWallet, profiles, activeWallet, activeProfile]);
-
-  // Fetch Profiles for the Account Identifier (chainId)
   const fetchProfiles = async (identifier: string) => {
     try {
       if (profileCache.current.has(identifier)) {
-        console.log("Using cached profiles for identifier:", identifier);
         setProfiles(profileCache.current.get(identifier)!);
         return;
       }
-  
+
       const { data, error } = await supabase
         .from("profiles")
         .select(
           "id, display_name, username, about, profile_image_url, banner_image_url, membership_tier, profile_type, role, wallet_address, account_identifier, blockchain_wallet, email, password, short_id, linked, links"
         )
         .eq("account_identifier", identifier);
-  
+
       if (error) throw new Error(error.message);
-  
-      const formattedData = (data || []).map(profile => ({
+
+      const formattedData = (data || []).map((profile) => ({
         id: profile.id,
         displayName: profile.display_name,
         username: profile.username,
@@ -142,7 +144,7 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
         linked: profile.linked,
         links: profile.links,
       }));
-  
+
       profileCache.current.set(identifier, formattedData);
       setProfiles(formattedData);
       setUsername(formattedData[0]?.username || null);
@@ -152,45 +154,55 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       setUsername(null);
     }
   };
-  
 
-  // Automatically Sync Wallet Connection
+  // Event synchronization across tabs
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "walletAddress" || event.key === "accountIdentifier") {
+        setWalletAddress(Cookies.get("walletAddress") || null);
+        setAccountIdentifier(Cookies.get("accountIdentifier") || null);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   useEffect(() => {
     console.log("Wallet connection status changed:", { isConnected, address, caipAddress, status });
-  
-    if (isConnected && address) {
-      const chainId = caipAddress?.split(":")[1] || null; // Extract chainId
-      setWalletAddress(address);
-      setAccountIdentifier(chainId); // Store chainId only
-      setBlockchainWallet(caipAddress || `${chainId}:${address}`); // Store legacy identifier
-      if (chainId) fetchProfiles(chainId);
+
+    if (status === "connecting" || status === "reconnecting") {
+      console.log("Wallet is connecting or reconnecting...");
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, caipAddress]);
-  
 
-  // Set Active Wallet and Profile
+    if (isConnected && address) {
+      const chainId = caipAddress?.split(":")[1] || null;
+      const userId = Cookies.get("accountIdentifier") || generateAccountIdentifier();
 
-  // Wallet Connection Logic
-  const handleConnect = async (connector: Connector & { getAddress?: () => Promise<string> }) => {
-    try {
-      console.log("Attempting to connect wallet with connector:", connector);
-      await connect({ connector });
-      const newAddress = connector.getAddress ? await connector.getAddress() : address;
-      if (newAddress) {
-        console.log("Wallet connected with address:", newAddress);
-        setWalletAddress(newAddress);
-        setAccountIdentifier(newAddress);
-        fetchProfiles(newAddress);
+      if (!Cookies.get("accountIdentifier")) {
+        Cookies.set("accountIdentifier", userId, { path: "/", expires: 7 });
       }
+
+      Cookies.set("walletAddress", address, { path: "/", expires: 7 });
+
+      setAccountIdentifier(userId);
+      setWalletAddress(address);
+      setBlockchainWallet(caipAddress || `${chainId}:${address}`);
+
+      fetchProfiles(userId);
+    }
+  }, [isConnected, address, caipAddress, status]);
+
+  const handleConnect = async (connector: Connector) => {
+    try {
+      await connect({ connector });
     } catch (error) {
-      console.error("Wallet connection failed:", error);
+      console.error("Error connecting wallet:", error);
     }
   };
 
-  // Wallet Disconnection Logic
   const handleDisconnect = async () => {
-    console.log("Disconnecting wallet...");
     setWalletAddress(null);
     setAccountIdentifier(null);
     setBlockchainWallet(null);
@@ -198,6 +210,8 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
     setActiveProfile(null);
     setProfiles([]);
     profileCache.current.clear();
+    Cookies.remove("walletAddress");
+    Cookies.remove("accountIdentifier");
     await wagmiDisconnect();
   };
 
@@ -213,7 +227,7 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
             activeWallet,
             activeProfile,
             setActiveWallet,
-            switchProfile, // Expose as user-facing
+            switchProfile,
             connect: handleConnect,
             disconnect: handleDisconnect,
             connectors,
