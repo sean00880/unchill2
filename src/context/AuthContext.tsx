@@ -167,9 +167,14 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
     }
   };
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = async (disconnect: () => Promise<void>) => {
+    console.log("Disconnecting wallet and clearing state...");
+  
     try {
-      await wagmiDisconnect();
+      // Ensure the wallet is disconnected via AppKit
+      await disconnect();
+  
+      // Clear all relevant state variables
       setWalletAddress(null);
       setAccountIdentifier(null);
       setBlockchainWallet(null);
@@ -177,13 +182,17 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       setActiveProfile(null);
       setProfiles([]);
       profileCache.current.clear();
+  
+      // Remove cookies
       Cookies.remove("walletAddress");
       Cookies.remove("accountIdentifier");
+  
       console.log("Successfully disconnected wallet and cleared state.");
     } catch (error) {
       console.error("Error during wallet disconnection:", error);
     }
   };
+  
 
   useEffect(() => {
     const handleStorage = () => {
