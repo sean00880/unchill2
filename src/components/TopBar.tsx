@@ -76,7 +76,7 @@ export default function TopBar({
         >
           {isDarkMode ? "☀️" : "🌙"}
         </button>
-          <w3m-button/>
+
         {walletAddress ? (
           <div
             className="relative"
@@ -84,6 +84,7 @@ export default function TopBar({
             onMouseLeave={handleProfileLeave}
             ref={menuRef}
           >
+            <w3m-button/>
             {/* Profile Image */}
             <Image
               src={profileImage}
