@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation";
 import { generateShortId } from "../../../utils/idGenerator";
 
 export default function CreateProfilePage() {
-  const { walletAddress, accountIdentifier, blockchainWallet } = useAuthContext(); // Added blockchainWallet
+  const { walletAddress, accountIdentifier, blockchainWallet, fetchProfiles } =
+    useAuthContext();
   const router = useRouter();
 
   const [profileData, setProfileData] = useState({
@@ -28,12 +29,7 @@ export default function CreateProfilePage() {
     links: [],
   });
 
-  const [errors, setErrors] = useState({
-    displayName: "",
-    username: "",
-    about: "",
-  });
-
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [showRedirect, setShowRedirect] = useState(false);
@@ -65,14 +61,10 @@ export default function CreateProfilePage() {
     }
   };
 
-  const isFormValid =
-    !Object.values(errors).some((error) => error) &&
-    profileData.displayName &&
-    profileData.username;
+  const isFormValid = !Object.values(errors).some((error) => error) && profileData.displayName && profileData.username;
 
   const uploadImageToBucket = async (file: File | null, folder: string, filePrefix: string) => {
     if (!file) return null;
-
     try {
       const fileType = file.type.split("/")[1];
       const filename = `${filePrefix}.${fileType}`;
@@ -97,28 +89,27 @@ export default function CreateProfilePage() {
       setAlertMessage("Please connect your wallet.");
       return;
     }
-  
+
     if (!isFormValid) {
       setAlertMessage("Please fix all errors before submitting.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const profileFolder = profileData.username || "default";
       const profileImageUrl = await uploadImageToBucket(profileData.profilePicture, profileFolder, "profile");
       const bannerImageUrl = await uploadImageToBucket(profileData.bannerImage, profileFolder, "banner");
-  
-      const shortId = await generateShortId(); // Ensure globally unique short_id
-      console.log("Generated short_id:", shortId);
-  
+
+      const shortId = await generateShortId();
+
       const payload = {
         display_name: profileData.displayName,
         username: profileData.username,
         about: profileData.about,
-        account_identifier: accountIdentifier, // Group identifier
+        account_identifier: accountIdentifier,
         wallet_address: walletAddress,
-        blockchain_wallet: blockchainWallet, // Wallet and chain information
+        blockchain_wallet: blockchainWallet,
         profile_image_url: profileImageUrl,
         banner_image_url: bannerImageUrl,
         profile_type: profileData.profileType,
@@ -130,34 +121,38 @@ export default function CreateProfilePage() {
         links: profileData.links,
         short_id: shortId,
       };
-  
-      // Check if wallet_address already exists globally
+
+      if (!accountIdentifier) {
+        throw new Error("Account identifier is missing.");
+      }
+      
+      // API call validations
       const { data: existingProfilesByWallet } = await supabase
         .from("profiles")
         .select("id, wallet_address")
         .eq("wallet_address", walletAddress);
-  
-      if (existingProfilesByWallet && existingProfilesByWallet.length > 0) {
+      
+      if (existingProfilesByWallet?.length && existingProfilesByWallet.length > 0) {
         throw new Error("A profile already exists for this wallet address.");
       }
-  
-      // Check if username already exists within the same account_identifier
+      
       const { data: existingProfilesByUsername } = await supabase
         .from("profiles")
         .select("id, username")
         .eq("account_identifier", accountIdentifier)
         .eq("username", profileData.username);
-  
-      if (existingProfilesByUsername && existingProfilesByUsername.length > 0) {
+      
+      if (existingProfilesByUsername?.length && existingProfilesByUsername.length > 0) {
         throw new Error("A profile with the same username already exists under this account.");
       }
-  
-      // Insert new profile
+      
+
       const { error } = await supabase.from("profiles").insert(payload);
+
       if (error) throw new Error(error.message);
-  
-      console.log("Profile created successfully:", payload);
-  
+
+      await fetchProfiles(accountIdentifier); // Refresh profiles
+
       setAlertMessage("Profile created successfully!");
       setShowRedirect(true);
     } catch (error) {
@@ -167,7 +162,6 @@ export default function CreateProfilePage() {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="auth flex flex-col md:flex-row min-h-screen">
@@ -177,7 +171,7 @@ export default function CreateProfilePage() {
 
       {showRedirect && (
         <AlertModal
-          message="Profile creation successful! Redirecting to overview..."
+          message="Profile created successfully! Redirecting to overview..."
           onClose={() => {
             setShowRedirect(false);
             setTimeout(() => {
