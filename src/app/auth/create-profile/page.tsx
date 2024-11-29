@@ -89,20 +89,25 @@ export default function CreateProfilePage() {
       setAlertMessage("Please connect your wallet.");
       return;
     }
-
+  
     if (!isFormValid) {
       setAlertMessage("Please fix all errors before submitting.");
       return;
     }
-
+  
+    if (!accountIdentifier) {
+      setAlertMessage("Account identifier is missing.");
+      return;
+    }
+  
     setLoading(true);
     try {
       const profileFolder = profileData.username || "default";
       const profileImageUrl = await uploadImageToBucket(profileData.profilePicture, profileFolder, "profile");
       const bannerImageUrl = await uploadImageToBucket(profileData.bannerImage, profileFolder, "banner");
-
+  
       const shortId = await generateShortId();
-
+  
       const payload = {
         display_name: profileData.displayName,
         username: profileData.username,
@@ -121,38 +126,33 @@ export default function CreateProfilePage() {
         links: profileData.links,
         short_id: shortId,
       };
-
-      if (!accountIdentifier) {
-        throw new Error("Account identifier is missing.");
-      }
-      
-      // API call validations
+  
+      // Validate wallet and username
       const { data: existingProfilesByWallet } = await supabase
         .from("profiles")
-        .select("id, wallet_address")
+        .select("id")
         .eq("wallet_address", walletAddress);
-      
-      if (existingProfilesByWallet?.length && existingProfilesByWallet.length > 0) {
+  
+      if (existingProfilesByWallet?.length > 0) {
         throw new Error("A profile already exists for this wallet address.");
       }
-      
+  
       const { data: existingProfilesByUsername } = await supabase
         .from("profiles")
-        .select("id, username")
+        .select("id")
         .eq("account_identifier", accountIdentifier)
         .eq("username", profileData.username);
-      
-      if (existingProfilesByUsername?.length && existingProfilesByUsername.length > 0) {
-        throw new Error("A profile with the same username already exists under this account.");
+  
+      if (existingProfilesByUsername?.length > 0) {
+        throw new Error("A profile with this username already exists under your account.");
       }
-      
-
+  
+      // Insert new profile
       const { error } = await supabase.from("profiles").insert(payload);
-
       if (error) throw new Error(error.message);
-
-      await fetchProfiles(accountIdentifier); // Refresh profiles
-
+  
+      await fetchProfiles(accountIdentifier);
+  
       setAlertMessage("Profile created successfully!");
       setShowRedirect(true);
     } catch (error) {
@@ -162,6 +162,7 @@ export default function CreateProfilePage() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="auth flex flex-col md:flex-row min-h-screen">
