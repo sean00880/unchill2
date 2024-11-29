@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Connector } from "wagmi";
-import { useAuthContext, Profile } from "../context/AuthContext";
+import { Profile } from "../context/AuthContext";
 
 interface TopBarProps {
   isDarkMode: boolean;
@@ -14,6 +14,7 @@ interface TopBarProps {
   walletAddress: string | null;
   profiles: Profile[];
   activeProfile: Profile | null;
+  switchProfile: (walletAddress: string) => void;
 }
 
 export default function TopBar({
@@ -25,22 +26,17 @@ export default function TopBar({
   walletAddress,
   profiles,
   activeProfile,
+  switchProfile,
 }: TopBarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Get switchProfile from AuthContext
-  const { switchProfile } = useAuthContext();
-
-  // Compute profile image
   const profileImage =
     activeProfile?.profileImageUrl || "/images/default_logo.jpg";
 
-  // Handle profile menu hover
   const handleProfileHover = () => setIsMenuOpen(true);
   const handleProfileLeave = () => setIsMenuOpen(false);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -78,7 +74,7 @@ export default function TopBar({
         >
           {isDarkMode ? "☀️" : "🌙"}
         </button>
-          <w3m-button/>
+
         {walletAddress ? (
           <div
             className="relative"
@@ -125,7 +121,7 @@ export default function TopBar({
           </div>
         ) : (
           // Wallet Connectors Dropdown
-          <w3m-button/>
+          <w3m-button />
         )}
       </div>
     </div>

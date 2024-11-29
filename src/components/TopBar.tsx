@@ -2,21 +2,33 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { Connector } from "wagmi";
 import { useAuthContext, Profile } from "../context/AuthContext";
 
-export default function TopBar() {
-  const {
-    isDarkMode,
-    toggleTheme,
-    disconnect,
-    walletAddress,
-    profiles,
-    activeProfile,
-    switchProfile,
-  } = useAuthContext();
+interface TopBarProps {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+  connect: (connector: Connector) => Promise<void>;
+  connectors: readonly Connector[];
+  disconnect: () => Promise<void>;
+  walletAddress: string | null;
+  profiles: Profile[];
+  activeProfile: Profile | null;
+}
 
+export default function TopBar({
+  isDarkMode,
+  toggleTheme,
+  disconnect,
+  walletAddress,
+  profiles,
+  activeProfile,
+}: TopBarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Get switchProfile from AuthContext
+  const { switchProfile } = useAuthContext();
 
   // Compute profile image
   const profileImage =
@@ -64,7 +76,7 @@ export default function TopBar() {
         >
           {isDarkMode ? "☀️" : "🌙"}
         </button>
-
+          <w3m-button/>
         {walletAddress ? (
           <div
             className="relative"
@@ -89,7 +101,8 @@ export default function TopBar() {
                     <li
                       key={profile.walletAddress}
                       className={`px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
-                        activeProfile?.walletAddress === profile.walletAddress
+                        activeProfile?.walletAddress ===
+                        profile.walletAddress
                           ? "font-bold"
                           : ""
                       }`}
@@ -109,8 +122,8 @@ export default function TopBar() {
             )}
           </div>
         ) : (
-          // Wallet Connect Button (w3m-button)
-          <w3m-button />
+          // Wallet Connectors Dropdown
+          <w3m-button/>
         )}
       </div>
     </div>
