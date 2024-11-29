@@ -19,6 +19,7 @@ interface TopBarProps {
 export default function TopBar({
   isDarkMode,
   toggleTheme,
+
   disconnect,
   walletAddress,
   profiles,

@@ -52,12 +52,12 @@ export interface AuthContextType {
   activeProfile: Profile | null;
   setActiveWallet: (walletAddress: string) => void;
   switchProfile: (walletAddress: string) => void;
-  connect: (options: { connector: Connector; chainId?: number }) => Promise<void>; // Updated type
+  connect: (options: { connector: Connector; chainId?: number }) => Promise<void>;
   disconnect: () => Promise<void>;
   connectors: readonly Connector[];
   fetchProfiles: (accountIdentifier: string) => Promise<void>;
+  createProfile: (newProfileData: Profile) => Promise<void>;
 }
-
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -80,7 +80,6 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const { connect, connectors } = useConnect();
   const { address, isConnected, caipAddress, status } = useAppKitAccount();
 
-  // Use cookies for initial state
   const [walletAddress, setWalletAddress] = useState<string | null>(
     validateCookie("walletAddress", cookies?.walletAddress ?? null, "0x")
   );
@@ -98,12 +97,13 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   const generateAccountIdentifier = () => `user-${crypto.randomUUID()}`;
 
   const switchProfile = (wallet: string) => {
-    if (!profiles.some((p) => p.walletAddress === wallet)) {
+    const profile = profiles.find((p) => p.walletAddress === wallet);
+    if (!profile) {
       console.error("Cannot switch to a non-existent profile:", wallet);
       return;
     }
     setActiveWallet(wallet);
-    setActiveProfile(profiles.find((p) => p.walletAddress === wallet) || null);
+    setActiveProfile(profile);
   };
 
   const fetchProfiles = async (identifier: string) => {
@@ -115,32 +115,17 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select(
-          "id, display_name, username, about, profile_image_url, banner_image_url, membership_tier, profile_type, role, wallet_address, account_identifier, blockchain_wallet, email, password, short_id, linked, links"
-        )
+        .select("*")
         .eq("account_identifier", identifier);
 
       if (error) throw new Error(error.message);
 
-      const formattedData = (data || []).map((profile) => ({
-        id: profile.id,
+      const formattedData = data?.map((profile) => ({
+        ...profile,
         displayName: profile.display_name,
-        username: profile.username,
-        about: profile.about,
         profileImageUrl: profile.profile_image_url,
         bannerImageUrl: profile.banner_image_url,
-        membershipTier: profile.membership_tier,
-        profileType: profile.profile_type,
-        role: profile.role,
-        walletAddress: profile.wallet_address,
-        accountIdentifier: profile.account_identifier,
-        blockchainWallet: profile.blockchain_wallet,
-        email: profile.email,
-        password: profile.password,
-        shortId: profile.short_id,
-        linked: profile.linked,
-        links: profile.links,
-      }));
+      })) || [];
 
       profileCache.current.set(identifier, formattedData);
       setProfiles(formattedData);
@@ -152,9 +137,30 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
     }
   };
 
+  const createProfile = async (newProfileData: Profile) => {
+    try {
+      const existingProfile = profiles.find(
+        (profile) => profile.walletAddress === newProfileData.walletAddress
+      );
+
+      if (existingProfile) {
+        console.error("Profile already exists for this wallet address.");
+        return;
+      }
+
+      const { error } = await supabase.from("profiles").insert(newProfileData);
+
+      if (error) throw new Error(error.message);
+
+      await fetchProfiles(accountIdentifier!); // Refresh profiles
+    } catch (error) {
+      console.error("Error creating profile:", error);
+    }
+  };
+
   const handleConnect = async (options: { connector: Connector; chainId?: number }) => {
     try {
-      await connect(options); // Call wagmi's connect with options
+      await connect(options);
       console.log("Wallet connected successfully:", options.connector.name);
     } catch (error) {
       console.error("Error during wallet connection:", error);
@@ -162,13 +168,8 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
   };
 
   const handleDisconnect = async () => {
-    console.log("Disconnecting wallet and clearing state...");
-
     try {
-      // Ensure the wallet is disconnected via AppKit
       await wagmiDisconnect();
-
-      // Clear all relevant state variables
       setWalletAddress(null);
       setAccountIdentifier(null);
       setBlockchainWallet(null);
@@ -176,25 +177,18 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       setActiveProfile(null);
       setProfiles([]);
       profileCache.current.clear();
-
-      // Remove cookies
       Cookies.remove("walletAddress");
       Cookies.remove("accountIdentifier");
-
       console.log("Successfully disconnected wallet and cleared state.");
     } catch (error) {
       console.error("Error during wallet disconnection:", error);
     }
   };
 
-  
-
   useEffect(() => {
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === "walletAddress" || event.key === "accountIdentifier") {
-        setWalletAddress(Cookies.get("walletAddress") || null);
-        setAccountIdentifier(Cookies.get("accountIdentifier") || null);
-      }
+    const handleStorage = () => {
+      setWalletAddress(Cookies.get("walletAddress") || null);
+      setAccountIdentifier(Cookies.get("accountIdentifier") || null);
     };
 
     window.addEventListener("storage", handleStorage);
@@ -232,7 +226,7 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       fetchProfiles(userId);
     }
   }, [isConnected, address, caipAddress, status]);
-  
+
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
@@ -248,9 +242,10 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
             switchProfile,
             disconnect: handleDisconnect,
             connectors,
-            connect: handleConnect, // Use the new handleConnect
+            connect: handleConnect,
             username,
             fetchProfiles,
+            createProfile,
           }}
         >
           {children}
