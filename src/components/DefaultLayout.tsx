@@ -76,7 +76,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <TopBar
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
-        connect={connect}
+        connect={(connector) => connect({ connector })} 
         connectors={connectors}
         disconnect={disconnect}
         walletAddress={walletAddress}

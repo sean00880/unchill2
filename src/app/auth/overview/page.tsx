@@ -12,6 +12,7 @@ export default function ProfileOverviewPage() {
     blockchainWallet, // Include blockchainWallet for additional context
     disconnect,
     profiles,
+    walletAddress,
     switchProfile, // Use switchProfile directly
   } = useAuthContext();
   const router = useRouter();
@@ -95,6 +96,9 @@ export default function ProfileOverviewPage() {
           </p>
           <p>
             <strong>Blockchain Wallet:</strong> {blockchainWallet}
+          </p>
+          <p>
+            <strong>Blockchain Wallet:</strong> {walletAddress}
           </p>
         </div>
 

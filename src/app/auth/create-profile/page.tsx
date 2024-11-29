@@ -7,10 +7,10 @@ import AlertModal from "../../../components/AlertModal";
 import { supabase } from "../../../utils/supaBaseClient";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { generateShortId } from '../../../utils/idGenerator';
+import { generateShortId } from "../../../utils/idGenerator";
 
 export default function CreateProfilePage() {
-  const { walletAddress, accountIdentifier } = useAuthContext();
+  const { walletAddress, accountIdentifier, blockchainWallet } = useAuthContext(); // Added blockchainWallet
   const router = useRouter();
 
   const [profileData, setProfileData] = useState({
@@ -22,10 +22,10 @@ export default function CreateProfilePage() {
     profileType: "Individual",
     role: "Normie",
     membershipTier: "basic",
-    email: "", // New field
-    password: "", // New field (if needed)
-    linked: [], // New field (array)
-    links: [], // New field (array)
+    email: "",
+    password: "",
+    linked: [],
+    links: [],
   });
 
   const [errors, setErrors] = useState({
@@ -36,7 +36,8 @@ export default function CreateProfilePage() {
 
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [showRedirect, setShowRedirect] = useState(false); // To handle the redirect modal logic
+  const [showRedirect, setShowRedirect] = useState(false);
+
   const validateField = (field: string, value: string) => {
     if (field === "displayName" && (value.length < 3 || value.length > 50)) {
       return "Display Name must be 3–50 characters long.";
@@ -64,7 +65,8 @@ export default function CreateProfilePage() {
     }
   };
 
-  const isFormValid = !Object.values(errors).some((error) => error) &&
+  const isFormValid =
+    !Object.values(errors).some((error) => error) &&
     profileData.displayName &&
     profileData.username;
 
@@ -82,10 +84,7 @@ export default function CreateProfilePage() {
           contentType: file.type,
         });
 
-      if (error) {
-        console.error("Error uploading image:", error.message);
-        throw new Error("Failed to upload image.");
-      }
+      if (error) throw new Error("Failed to upload image.");
       return `/api/${folder}/${filename}`;
     } catch (error) {
       console.error("Image upload failed:", error);
@@ -98,24 +97,25 @@ export default function CreateProfilePage() {
       setAlertMessage("Please connect your wallet.");
       return;
     }
-  
+
     if (!isFormValid) {
       setAlertMessage("Please fix all errors before submitting.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const profileFolder = profileData.username || "default";
       const profileImageUrl = await uploadImageToBucket(profileData.profilePicture, profileFolder, "profile");
       const bannerImageUrl = await uploadImageToBucket(profileData.bannerImage, profileFolder, "banner");
-  
+
       const payload = {
         display_name: profileData.displayName,
         username: profileData.username,
         about: profileData.about,
-        account_identifier: accountIdentifier,
+        account_identifier: accountIdentifier, // Chain ID
         wallet_address: walletAddress,
+        blockchain_wallet: blockchainWallet, // Chain ID + Wallet Address
         profile_image_url: profileImageUrl,
         banner_image_url: bannerImageUrl,
         profile_type: profileData.profileType,
@@ -125,55 +125,40 @@ export default function CreateProfilePage() {
         password: profileData.password,
         linked: profileData.linked,
         links: profileData.links,
-        short_id: generateShortId(), // Utility function to generate short IDs
+        short_id: generateShortId(),
       };
-  
-      console.log("Payload being sent to Supabase:", payload); // Log the payload to verify data
-  
-      const { data, error } = await supabase.from("profiles").insert(payload);
-  
-      console.log("Supabase response:", { data, error }); // Log the response for debugging
-  
-      if (error) {
-        console.error("Supabase Error:", error);
-        throw new Error("Failed to create profile.");
-      }
-  
+
+      const { error } = await supabase.from("profiles").insert(payload);
+      if (error) throw new Error("Failed to create profile.");
+
       setAlertMessage("Profile created successfully!");
-      setShowRedirect(true); // Show modal for redirect
+      setShowRedirect(true);
     } catch (error) {
-      console.error("Profile creation failed:", error); // Log the error for debugging
-  
-      // Narrow the error type to properly access the `message` property
-      if (error instanceof Error) {
-        setAlertMessage(error.message);
-      } else {
-        setAlertMessage("Failed to create profile due to an unknown error.");
-      }
+      console.error("Profile creation failed:", error);
+      if (error instanceof Error) setAlertMessage(error.message);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="auth flex flex-col md:flex-row min-h-screen">
-              {alertMessage && !showRedirect && (
+      {alertMessage && !showRedirect && (
         <AlertModal message={alertMessage} onClose={() => setAlertMessage(null)} />
       )}
-     {showRedirect && (
-  <AlertModal
-    message="Profile creation successful! Redirecting to overview..."
-    onClose={() => {
-      setShowRedirect(false); // Close the modal
-      setTimeout(() => {
-        router.push("/auth/overview"); // Redirect after modal closes
-      }, 300); // Adjust delay as necessary
-    }}
-  />
-)}
 
-      
+      {showRedirect && (
+        <AlertModal
+          message="Profile creation successful! Redirecting to overview..."
+          onClose={() => {
+            setShowRedirect(false);
+            setTimeout(() => {
+              router.push("/auth/overview");
+            }, 300);
+          }}
+        />
+      )}
+
       <div className="w-full md:w-1/2 overflow-auto p-4 mt-40">
         <ProfileForm profileData={profileData} handleChange={handleChange} errors={errors} />
       </div>

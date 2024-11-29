@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../context/AuthContext";
 
 export default function AuthPage() {
-  const { walletAddress, accountIdentifier, activeProfile } = useAuthContext();
+  const { walletAddress, activeProfile } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {
