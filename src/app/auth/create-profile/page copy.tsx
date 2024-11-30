@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, memo } from "react";
+import { useState } from "react";
 import ProfileForm from "../../../components/ProfileForm";
 import ProfilePreview from "../../../components/ProfilePreview";
 import AlertModal from "../../../components/AlertModal";
@@ -9,13 +9,9 @@ import { useAuthContext } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { generateShortId } from "../../../utils/idGenerator";
 
-// Memoized Components
-const MemoizedProfileForm = memo(ProfileForm);
-const MemoizedProfilePreview = memo(ProfilePreview);
-const MemoizedAlertModal = memo(AlertModal);
-
 export default function CreateProfilePage() {
-  const { walletAddress, accountIdentifier, blockchainWallet, fetchProfiles } = useAuthContext();
+  const { walletAddress, accountIdentifier, blockchainWallet, fetchProfiles } =
+    useAuthContext();
   const router = useRouter();
 
   const [profileData, setProfileData] = useState({
@@ -33,12 +29,7 @@ export default function CreateProfilePage() {
     links: [],
   });
 
-  type ErrorState = {
-    displayName?: string;
-    username?: string;
-    about?: string;
-  };
-  const [errors, setErrors] = useState<ErrorState>({});
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [showRedirect, setShowRedirect] = useState(false);
@@ -70,10 +61,7 @@ export default function CreateProfilePage() {
     }
   };
 
-  const isFormValid = useMemo(
-    () => !Object.values(errors).some((error) => error) && profileData.displayName && profileData.username,
-    [errors, profileData.displayName, profileData.username]
-  );
+  const isFormValid = !Object.values(errors).some((error) => error) && profileData.displayName && profileData.username;
 
   const uploadImageToBucket = async (file: File | null, folder: string, filePrefix: string) => {
     if (!file) return null;
@@ -97,24 +85,29 @@ export default function CreateProfilePage() {
   };
 
   const handleSubmitProfile = async () => {
-    const errorMessages: string[] = [];
-    if (!walletAddress) errorMessages.push("Please connect your wallet.");
-    if (!isFormValid) errorMessages.push("Please fix all errors before submitting.");
-    if (!accountIdentifier) errorMessages.push("Account identifier is missing.");
-
-    if (errorMessages.length > 0) {
-      setAlertMessage(errorMessages.join(" "));
+    if (!walletAddress) {
+      setAlertMessage("Please connect your wallet.");
       return;
     }
-
+  
+    if (!isFormValid) {
+      setAlertMessage("Please fix all errors before submitting.");
+      return;
+    }
+  
+    if (!accountIdentifier) {
+      setAlertMessage("Account identifier is missing.");
+      return;
+    }
+  
     setLoading(true);
     try {
       const profileFolder = profileData.username || "default";
       const profileImageUrl = await uploadImageToBucket(profileData.profilePicture, profileFolder, "profile");
       const bannerImageUrl = await uploadImageToBucket(profileData.bannerImage, profileFolder, "banner");
-
+  
       const shortId = await generateShortId();
-
+  
       const payload = {
         display_name: profileData.displayName,
         username: profileData.username,
@@ -127,41 +120,44 @@ export default function CreateProfilePage() {
         profile_type: profileData.profileType,
         role: profileData.role,
         membership_tier: profileData.membershipTier,
-        ...(profileData.email && { email: profileData.email }),
-        ...(profileData.password && { password: profileData.password }),
-        ...(profileData.linked.length > 0 && { linked: profileData.linked }),
-        ...(profileData.links.length > 0 && { links: profileData.links }),
+        email: profileData.email,
+        password: profileData.password,
+        linked: profileData.linked,
+        links: profileData.links,
         short_id: shortId,
       };
-
+  
+      if (!accountIdentifier) {
+        throw new Error("Account identifier is missing.");
+      }
+      
       // API call validations
       const { data: existingProfilesByWallet } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, wallet_address")
         .eq("wallet_address", walletAddress);
-
-      if (existingProfilesByWallet && existingProfilesByWallet.length > 0) {
+      
+      if (existingProfilesByWallet?.length && existingProfilesByWallet.length > 0) {
         throw new Error("A profile already exists for this wallet address.");
       }
-
+      
       const { data: existingProfilesByUsername } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, username")
         .eq("account_identifier", accountIdentifier)
         .eq("username", profileData.username);
-
-      if (existingProfilesByUsername && existingProfilesByUsername.length > 0) {
+      
+      if (existingProfilesByUsername?.length && existingProfilesByUsername.length > 0) {
         throw new Error("A profile with the same username already exists under this account.");
       }
+      
 
       const { error } = await supabase.from("profiles").insert(payload);
 
       if (error) throw new Error(error.message);
 
-      if (accountIdentifier) {
-        await fetchProfiles(accountIdentifier);
-      }
-
+      await fetchProfiles(accountIdentifier); // Refresh profiles
+  
       setAlertMessage("Profile created successfully!");
       setShowRedirect(true);
     } catch (error) {
@@ -171,40 +167,33 @@ export default function CreateProfilePage() {
       setLoading(false);
     }
   };
-
-
-  const alertModal = useMemo(() => {
-    if (!alertMessage) return null;
-    return <MemoizedAlertModal message={alertMessage} onClose={() => setAlertMessage(null)} />;
-  }, [alertMessage]);
-
-  const redirectModal = useMemo(() => {
-    if (!showRedirect) return null;
-    return (
-      <MemoizedAlertModal
-        message="Profile created successfully! Redirecting to overview..."
-        onClose={() => {
-          setShowRedirect(false);
-          setTimeout(() => {
-            router.replace("/auth/overview");
-          }, 300);
-        }}
-      />
-    );
-  }, [showRedirect, router]);
+  
 
   return (
     <div className="auth flex flex-col md:flex-row min-h-screen">
-      {alertModal}
-      {redirectModal}
+      {alertMessage && !showRedirect && (
+        <AlertModal message={alertMessage} onClose={() => setAlertMessage(null)} />
+      )}
+
+      {showRedirect && (
+        <AlertModal
+          message="Profile created successfully! Redirecting to overview..."
+          onClose={() => {
+            setShowRedirect(false);
+            setTimeout(() => {
+              router.push("/auth/overview");
+            }, 300);
+          }}
+        />
+      )}
 
       <div className="w-full md:w-1/2 overflow-auto p-4 mt-40">
-        <MemoizedProfileForm profileData={profileData} handleChange={handleChange} errors={errors} />
+        <ProfileForm profileData={profileData} handleChange={handleChange} errors={errors} />
       </div>
 
       <div className="w-full md:w-1/2 flex justify-center items-start">
         <div className="sticky top-20 p-6 w-full">
-          <MemoizedProfilePreview profileData={profileData} />
+          <ProfilePreview profileData={profileData} />
           <div className="w-full mt-6">
             <button
               onClick={handleSubmitProfile}
