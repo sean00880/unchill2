@@ -15,6 +15,7 @@ import { WagmiProvider } from "wagmi";
 import { config } from "../lib/config";
 import { ReactNode } from "react";
 import Cookies from "js-cookie";
+import LandingLayout from "@components/LandingLayout";
 
 // Define local fonts
 const geistSans = localFont({
@@ -79,7 +80,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 ) : isBlogPage ? (
                   <DocumentationLayout posts={posts}>{children}</DocumentationLayout>
                 ) : (
-                  <DefaultLayout>{children}</DefaultLayout>
+                  <LandingLayout>{children}</LandingLayout>
                 )}
               </body>
             </html>
