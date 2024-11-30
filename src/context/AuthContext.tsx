@@ -169,12 +169,8 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
 
   const handleDisconnect = async () => {
     console.log("Disconnecting wallet and clearing state...");
-  
     try {
-      // Ensure the wallet is disconnected via AppKit
       await wagmiDisconnect();
-  
-      // Clear all relevant state variables
       setWalletAddress(null);
       setAccountIdentifier(null);
       setBlockchainWallet(null);
@@ -182,18 +178,13 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
       setActiveProfile(null);
       setProfiles([]);
       profileCache.current.clear();
-  
-      // Remove cookies
       Cookies.remove("walletAddress");
       Cookies.remove("accountIdentifier");
-  
       console.log("Successfully disconnected wallet and cleared state.");
     } catch (error) {
       console.error("Error during wallet disconnection:", error);
     }
   };
-  
-  
 
   useEffect(() => {
     const handleStorage = () => {
@@ -207,32 +198,31 @@ export const AuthProvider = ({ children, cookies }: AuthProviderProps) => {
 
   useEffect(() => {
     console.log("Wallet connection status changed:", { isConnected, address, caipAddress, status });
-  
-    // Prevent reconnection attempts when walletAddress or accountIdentifier is cleared (logged out state)
+
     if (!isConnected || !address) {
       console.log("No connected wallet found. Skipping wallet setup.");
       return;
     }
-  
+
     if (status === "connecting" || status === "reconnecting") {
       console.log("Wallet is connecting or reconnecting...");
       return;
     }
-  
+
     if (isConnected && address) {
       const chainId = caipAddress?.split(":")[1] || null;
       const userId = Cookies.get("accountIdentifier") || generateAccountIdentifier();
-  
+
       if (!Cookies.get("accountIdentifier")) {
         Cookies.set("accountIdentifier", userId, { path: "/", expires: 7 });
       }
-  
+
       Cookies.set("walletAddress", address, { path: "/", expires: 7 });
-  
+
       setAccountIdentifier(userId);
       setWalletAddress(address);
       setBlockchainWallet(caipAddress || `${chainId}:${address}`);
-  
+
       fetchProfiles(userId);
     }
   }, [isConnected, address, caipAddress, status]);
